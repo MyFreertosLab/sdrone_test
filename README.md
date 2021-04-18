@@ -1,17 +1,17 @@
 ESP32 ESP-IDF Drone
 ===================
 
-This is a Drone Implementation with esp-idf and esp32.
+This is a Drone Test Implementation with esp-idf and esp32.
 This software is under construction
 
 ```
-  git clone --recursive git@github.com:MyFreertosLab/sdrone.git
+  git clone --recursive git@github.com:MyFreertosLab/sdrone_test.git
   idf.py build
   idf.py flash
 ```
 <h1>State of the art</h1>
 <p align="left">
-  <img src="https://github.com/MyFreertosLab/sdrone/blob/master/docs/images/Step1.jpg" width="300" title="The hardware">
+  <img src="https://github.com/MyFreertosLab/sdrone_test/blob/master/docs/images/Step1.jpg" width="300" title="The hardware">
   <p>Step 1: Minimal Hardware List</p>
 </p>
 
