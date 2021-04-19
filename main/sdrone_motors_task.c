@@ -35,16 +35,28 @@ void sdrone_motors_task(void *arg) {
 	motors_t motors;
 	motors_handle_t motors_handle = &motors;
 	sdrone_motors_task_init(motors_handle);
-    vTaskDelay(1000); //delay of 1s
+    vTaskDelay(100); //delay of 1s
 
 	printf("sdrone_motors_task_init::Arm motors without program esc\n");
 	ESP_ERROR_CHECK(motors_arm(motors_handle));
 
-    vTaskDelay(10); //delay of 10ms
-
+    vTaskDelay(10); //delay of 1/10s
+    float duty_min = 40.0f;
+    float duty_max = 99.0f;
+    float increment = 1.0f;
 	while(true) {
 		printf("Cycle motors\n");
-	    vTaskDelay(1000); //delay of 10s
+		//TODO: aggiornare il duty
+		if(motors_handle->motor[0].duty_cycle >= duty_max) {
+			increment = -1.0f;
+		}
+		if(motors_handle->motor[0].duty_cycle <= duty_min) {
+			increment = 1.0f;
+		}
+		motors_handle->motor[0].duty_cycle += increment;
+		motors_handle->motor[1].duty_cycle += increment;
+		motors_update(motors_handle);
+	    vTaskDelay(100);
 	};
 
 }

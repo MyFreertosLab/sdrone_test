@@ -54,7 +54,7 @@ typedef struct {
 
 typedef struct {
 	motor_t motor[MOTORS_MAX_NUM];
-	uint16_t frequency;
+	uint32_t frequency;
 	uint8_t motors_num;
 	int switch_on_off_pin;
 	motors_status_t status;
@@ -66,7 +66,7 @@ esp_err_t motors_init(motors_handle_t motors_handle);
 esp_err_t motors_arm(motors_handle_t motors_handle);
 esp_err_t motors_disarm(motors_handle_t motors_handle);
 esp_err_t motors_switchoff(motors_handle_t motors_handle);
-esp_err_t motors_switchon(motors_handle_t motors_handle, bool program_esc);
+esp_err_t motors_switchon(motors_handle_t motors_handle);
 esp_err_t motors_update(motors_handle_t motors_handle);
 
 #endif /* COMPONENTS_MOTORS_INCLUDE_MOTORS_H_ */

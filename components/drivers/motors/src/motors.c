@@ -1,4 +1,5 @@
-// Da implementare
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <motors.h>
 
 static mcpwm_dev_t *MCPWM[2] = {&MCPWM0, &MCPWM1};
@@ -16,8 +17,8 @@ esp_err_t motors_init_pwm_timer(motors_handle_t motors_handle, mcpwm_unit_t unit
     mcpwm_config_t pwm_config;
     pwm_config.frequency = motors_handle->frequency;
     // FIXME: cmpr_a/b dipendono dalla frequenza. Aggiungere calcolo
-    pwm_config.cmpr_a = 50.0;
-    pwm_config.cmpr_b = 50.0;
+    pwm_config.cmpr_a = 40.0;
+    pwm_config.cmpr_b = 40.0;
     pwm_config.counter_mode = MCPWM_UP_COUNTER;
     pwm_config.duty_mode = MCPWM_DUTY_MODE_0;
     return mcpwm_init(unit, timer, &pwm_config);
@@ -25,7 +26,7 @@ esp_err_t motors_init_pwm_timer(motors_handle_t motors_handle, mcpwm_unit_t unit
 
 esp_err_t motors_low_duty_motor(motors_handle_t motors_handle, uint8_t motor_num) {
 	printf("motors: motors_low_duty_motor [%d]\n", motor_num);
-	ESP_ERROR_CHECK(mcpwm_set_duty(motors_handle->motor[motor_num].mcpwm, motors_timers[motor_num],motors_pwm_generator[motor_num],50.0));
+	ESP_ERROR_CHECK(mcpwm_set_duty(motors_handle->motor[motor_num].mcpwm, motors_timers[motor_num],motors_pwm_generator[motor_num],40.0));
 	return ESP_OK;
 }
 
@@ -59,6 +60,7 @@ esp_err_t motors_update_motors(motors_handle_t motors_handle) {
 	if(motors_handle->status == ON_ARMED) {
 	  for (uint8_t i = 0; i < MOTORS_MAX_NUM; i++) {
 		if (motors_handle->motor[i].enabled) {
+		  printf("motors: motors_update_motors[%d/%2.2f]\n", i, motors_handle->motor[i].duty_cycle);
 		  ESP_ERROR_CHECK(mcpwm_set_duty(motors_handle->motor[i].mcpwm, motors_timers[i],motors_pwm_generator[i],motors_handle->motor[i].duty_cycle));
 		}
 	  }
@@ -106,6 +108,7 @@ esp_err_t motors_init_mcpwm(motors_handle_t motors_handle, mcpwm_unit_t unit) {
       if(motors_handle->motor[i+si].enabled) {
         motors_handle->motor[i+si].mcpwm = unit;
         motors_handle->motor[i+si].num = i+si;
+        motors_handle->motor[i+si].duty_cycle = 40.0f;
       }
     }
     printf("motors::motors_init_mcpwm: END\n");
@@ -120,12 +123,14 @@ esp_err_t motors_init(motors_handle_t motors_handle) {
 	motors_handle->frequency = MOTORS_PWM_FREQUENCY;
 	ESP_ERROR_CHECK(motors_init_mcpwm(motors_handle, MCPWM_UNIT_0));
 	ESP_ERROR_CHECK(motors_init_mcpwm(motors_handle, MCPWM_UNIT_1));
+
+	ESP_ERROR_CHECK(motors_switchon(motors_handle));
 	return ESP_OK;
 }
 
 esp_err_t motors_arm(motors_handle_t motors_handle) {
 	printf("motors: motors_arm\n");
-	ESP_ERROR_CHECK(motors_switchon(motors_handle, false));
+	ESP_ERROR_CHECK(motors_switchon(motors_handle));
     motors_handle->status = ON_ARMED;
     ESP_ERROR_CHECK(motors_low_duty_motors(motors_handle));;
 	return ESP_OK;
@@ -143,19 +148,10 @@ esp_err_t motors_switchoff(motors_handle_t motors_handle) {
     motors_handle->status = OFF;
 	return ESP_OK;
 }
-esp_err_t motors_switchon(motors_handle_t motors_handle, bool program_esc) {
-	printf("motors: motors_switchon [%d]\n", program_esc);
-	if(program_esc) {
-		// FIXME: vedere come inserire gli sleep
-		ESP_ERROR_CHECK(motors_switchoff(motors_handle));
-		// sleep(10);
-		ESP_ERROR_CHECK(motors_high_duty_motors(motors_handle));
-		//sleep(2);
-		ESP_ERROR_CHECK(motors_switchon(motors_handle, false));
-	} else {
-		ESP_ERROR_CHECK(motors_low_duty_motors(motors_handle));
-	    motors_handle->status = ON_DISARMED;
-	}
+esp_err_t motors_switchon(motors_handle_t motors_handle) {
+	printf("motors: motors_switchon\n");
+	ESP_ERROR_CHECK(motors_low_duty_motors(motors_handle));
+	motors_handle->status = ON_DISARMED;
 	return ESP_OK;
 }
 esp_err_t motors_update(motors_handle_t motors_handle) {
