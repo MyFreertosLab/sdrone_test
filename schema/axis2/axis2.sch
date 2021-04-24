@@ -17,101 +17,100 @@ $EndDescr
 $Comp
 L axis2-rescue:Conn_02x10_Odd_Even-Connector_Generic J1
 U 1 1 6072B308
-P 3000 4700
-F 0 "J1" H 3050 5317 50  0000 C CNN
-F 1 "JA" H 3050 5226 50  0000 C CNN
-F 2 "Connector_PinSocket_2.54mm:PinSocket_2x10_P2.54mm_Vertical" H 3000 4700 50  0001 C CNN
-F 3 "~" H 3000 4700 50  0001 C CNN
-	1    3000 4700
+P 2250 6050
+F 0 "J1" H 2300 6667 50  0000 C CNN
+F 1 "JA" H 2300 6576 50  0000 C CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_2x10_P2.54mm_Vertical" H 2250 6050 50  0001 C CNN
+F 3 "~" H 2250 6050 50  0001 C CNN
+	1    2250 6050
 	1    0    0    -1  
 $EndComp
 $Comp
 L axis2-rescue:Conn_02x10_Odd_Even-Connector_Generic J2
 U 1 1 6072B4E0
-P 6500 4700
-F 0 "J2" H 6550 5317 50  0000 C CNN
-F 1 "JB" H 6550 5226 50  0000 C CNN
-F 2 "Connector_PinSocket_2.54mm:PinSocket_2x10_P2.54mm_Vertical" H 6500 4700 50  0001 C CNN
-F 3 "~" H 6500 4700 50  0001 C CNN
-	1    6500 4700
+P 5750 6050
+F 0 "J2" H 5800 6667 50  0000 C CNN
+F 1 "JB" H 5800 6576 50  0000 C CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_2x10_P2.54mm_Vertical" H 5750 6050 50  0001 C CNN
+F 3 "~" H 5750 6050 50  0001 C CNN
+	1    5750 6050
 	1    0    0    -1  
 $EndComp
-NoConn ~ 2800 4400
-NoConn ~ 2800 4500
-NoConn ~ 2800 4600
-NoConn ~ 2800 4700
-NoConn ~ 2800 4800
-NoConn ~ 2800 5100
-NoConn ~ 2800 5200
-NoConn ~ 3300 5200
-NoConn ~ 3300 5100
-NoConn ~ 3300 5000
-NoConn ~ 3300 4800
-NoConn ~ 3300 4700
-NoConn ~ 3300 4600
-NoConn ~ 3300 4500
-NoConn ~ 3300 4400
-NoConn ~ 3300 4300
-NoConn ~ 6300 4300
-NoConn ~ 6300 4400
-NoConn ~ 6300 4500
-NoConn ~ 6300 4600
-NoConn ~ 6300 4800
-NoConn ~ 6300 4900
-NoConn ~ 6300 5100
-NoConn ~ 6300 5200
-NoConn ~ 6800 5200
-NoConn ~ 6800 5100
+NoConn ~ 2050 5750
+NoConn ~ 2050 5850
+NoConn ~ 2050 6050
+NoConn ~ 2050 6150
+NoConn ~ 2050 6450
+NoConn ~ 2050 6550
+NoConn ~ 2550 6550
+NoConn ~ 2550 6450
+NoConn ~ 2550 6350
+NoConn ~ 2550 6150
+NoConn ~ 2550 6050
+NoConn ~ 2550 5950
+NoConn ~ 2550 5850
+NoConn ~ 2550 5750
+NoConn ~ 2550 5650
+NoConn ~ 5550 5650
+NoConn ~ 5550 5750
+NoConn ~ 5550 5850
+NoConn ~ 5550 5950
+NoConn ~ 5550 6150
+NoConn ~ 5550 6250
+NoConn ~ 5550 6450
+NoConn ~ 5550 6550
+NoConn ~ 6050 6550
+NoConn ~ 6050 6450
 $Comp
 L gy-9250:gy-9250 U1
 U 1 1 6073C1B2
-P 4900 4800
-F 0 "U1" H 4900 5700 50  0000 L CNN
-F 1 "gy-9250" V 5200 4750 50  0000 L CNN
-F 2 "gy-9250_footprint:gy-9250" H 4900 5050 50  0001 C CNN
-F 3 "" H 4900 5050 50  0001 C CNN
-	1    4900 4800
+P 4150 6150
+F 0 "U1" H 4150 7050 50  0000 L CNN
+F 1 "gy-9250" V 4450 6100 50  0000 L CNN
+F 2 "gy-9250_footprint:gy-9250" H 4150 6400 50  0001 C CNN
+F 3 "" H 4150 6400 50  0001 C CNN
+	1    4150 6150
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2650 4900 2800 4900
-Text GLabel 4350 5000 0    50   Output ~ 0
+	1900 6250 2050 6250
+Text GLabel 3600 6350 0    50   Output ~ 0
 MISO
-Text GLabel 2650 4900 0    50   Input ~ 0
+Text GLabel 1900 6250 0    50   Input ~ 0
 MISO
 Wire Wire Line
-	2650 5000 2800 5000
-Text GLabel 4350 4550 0    50   Input ~ 0
+	1900 6350 2050 6350
+Text GLabel 3600 5900 0    50   Input ~ 0
 MOSI
-Text GLabel 3500 4900 2    50   Output ~ 0
+Text GLabel 2750 6250 2    50   Output ~ 0
 SCL
 Wire Wire Line
-	3300 4900 3500 4900
-Text GLabel 2650 5000 0    50   Output ~ 0
+	2550 6250 2750 6250
+Text GLabel 1900 6350 0    50   Output ~ 0
 MOSI
-Text GLabel 2600 4300 0    50   Output ~ 0
+Text GLabel 1850 5650 0    50   Output ~ 0
 +3V3
 Wire Wire Line
-	2600 4300 2800 4300
-Text GLabel 4350 4100 0    50   Input ~ 0
+	1850 5650 2050 5650
+Text GLabel 3600 5450 0    50   Input ~ 0
 +3V3
-Text GLabel 6800 5000 2    50   Output ~ 0
+Text GLabel 6050 6350 2    50   Output ~ 0
 NCS
-Text GLabel 4350 5300 0    50   Input ~ 0
+Text GLabel 3600 6650 0    50   Input ~ 0
 NCS
-NoConn ~ 6800 4900
-NoConn ~ 6800 4700
-NoConn ~ 6800 4500
-NoConn ~ 6800 4400
-Text GLabel 6300 5000 0    50   Output ~ 0
+NoConn ~ 6050 6250
+NoConn ~ 6050 6050
+NoConn ~ 6050 5850
+NoConn ~ 6050 5750
+Text GLabel 5550 6350 0    50   Output ~ 0
 INT
-Text GLabel 4350 5150 0    50   Input ~ 0
+Text GLabel 3600 6500 0    50   Input ~ 0
 INT
-Text GLabel 4350 4400 0    50   Input ~ 0
+Text GLabel 3600 5750 0    50   Input ~ 0
 SCL
-NoConn ~ 4350 5450
-NoConn ~ 4350 4700
-NoConn ~ 4350 4850
+NoConn ~ 3600 6800
+NoConn ~ 3600 6050
+NoConn ~ 3600 6200
 $Comp
 L axis2-rescue:L7805-Regulator_Linear U2
 U 1 1 60754FE6
@@ -229,22 +228,18 @@ Text Label 5400 2050 1    50   ~ 0
 GND
 Wire Wire Line
 	5400 1800 5400 2050
-Text Label 4250 4250 2    50   ~ 0
+Text Label 3500 5600 2    50   ~ 0
 GND
 Wire Wire Line
-	4350 4250 4250 4250
-Text Label 7050 4800 2    50   ~ 0
+	3600 5600 3500 5600
+Text Label 6300 6150 2    50   ~ 0
 GND
 Wire Wire Line
-	6800 4800 7050 4800
-Text Label 3250 1500 1    50   ~ 0
+	6050 6150 6300 6150
+Text Label 3400 1450 3    50   ~ 0
 GND
-Wire Wire Line
-	3250 1200 3250 1500
-Text GLabel 3350 1350 3    50   Input ~ 0
+Text GLabel 3250 1350 3    50   Input ~ 0
 +12V
-Wire Wire Line
-	3350 1350 3350 1200
 Text GLabel 4850 2500 3    50   Input ~ 0
 +5V
 Text Label 5000 2550 3    50   ~ 0
@@ -276,7 +271,6 @@ F 3 "~" H 5412 950 50  0001 C CNN
 $EndComp
 NoConn ~ 5300 1100
 NoConn ~ 5500 1100
-NoConn ~ 6350 2000
 $Comp
 L dk_Rectangular-Connectors-Headers-Male-Pins:22-23-2021 J5
 U 1 1 607713B7
@@ -318,7 +312,7 @@ F 12 "Active" H 8150 2200 60  0001 L CNN "Status"
 	-1   0    0    1   
 $EndComp
 Text GLabel 7000 1350 3    50   Input ~ 0
-+12V
++12VM
 Text GLabel 6900 1350 3    50   Input ~ 0
 GND
 Wire Wire Line
@@ -326,22 +320,14 @@ Wire Wire Line
 Wire Wire Line
 	6900 1350 6900 1100
 Text GLabel 7950 1350 3    50   Input ~ 0
-+12V
++12VM
 Wire Wire Line
 	7950 1350 7950 1100
 Text GLabel 7850 1350 3    50   Input ~ 0
 GND
 Wire Wire Line
 	7850 1350 7850 1100
-Wire Notes Line
-	6650 700  6650 1650
-Wire Notes Line
-	6650 1650 8700 1650
-Wire Notes Line
-	8700 1650 8700 700 
-Wire Notes Line
-	8700 700  6650 700 
-Text Notes 8300 1550 0    50   ~ 0
+Text Notes 8600 3400 0    50   ~ 0
 Power\nMotors
 Wire Notes Line
 	2200 700  2200 2100
@@ -364,81 +350,77 @@ Wire Notes Line
 Text Notes 5950 2700 0    50   ~ 0
 Power 5V
 Wire Notes Line
-	2150 5750 7300 5750
+	1400 7100 6550 7100
 Wire Notes Line
-	7300 5750 7300 3550
+	6550 7100 6550 4900
 Wire Notes Line
-	7300 3550 2150 3550
+	6550 4900 1400 4900
 Wire Notes Line
-	2150 3550 2150 5750
-Text Notes 6450 5600 0    50   ~ 0
+	1400 4900 1400 7100
+Text Notes 5700 6950 0    50   ~ 0
 Controller Board
 $Comp
 L Connector_Generic:Conn_01x03 J7
 U 1 1 6075F9C4
-P 7150 2150
-F 0 "J7" H 7230 2192 50  0000 L CNN
-F 1 "M1" H 7230 2101 50  0000 L CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Horizontal" H 7150 2150 50  0001 C CNN
-F 3 "~" H 7150 2150 50  0001 C CNN
-	1    7150 2150
+P 9750 1150
+F 0 "J7" H 9830 1192 50  0000 L CNN
+F 1 "M1" H 9830 1101 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Horizontal" H 9750 1150 50  0001 C CNN
+F 3 "~" H 9750 1150 50  0001 C CNN
+	1    9750 1150
 	1    0    0    -1  
 $EndComp
 $Comp
 L Connector_Generic:Conn_01x03 J8
 U 1 1 6075FA63
-P 8200 2150
-F 0 "J8" H 8280 2192 50  0000 L CNN
-F 1 "M2" H 8280 2101 50  0000 L CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Horizontal" H 8200 2150 50  0001 C CNN
-F 3 "~" H 8200 2150 50  0001 C CNN
-	1    8200 2150
+P 10800 1150
+F 0 "J8" H 10880 1192 50  0000 L CNN
+F 1 "M2" H 10880 1101 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Horizontal" H 10800 1150 50  0001 C CNN
+F 3 "~" H 10800 1150 50  0001 C CNN
+	1    10800 1150
 	1    0    0    -1  
 $EndComp
 Wire Notes Line
-	6500 1850 6500 2500
+	9100 850  9100 1500
 Wire Notes Line
-	6500 2500 8550 2500
+	9100 1500 11150 1500
 Wire Notes Line
-	8550 2500 8550 1850
+	11150 1500 11150 850 
 Wire Notes Line
-	8550 1850 6500 1850
-Text Notes 7850 2450 0    50   ~ 0
+	11150 850  9100 850 
+Text Notes 10450 1450 0    50   ~ 0
 Motors Control
 Wire Wire Line
-	6800 2050 6950 2050
+	9400 1150 9550 1150
 Wire Wire Line
-	7800 2050 8000 2050
-Wire Wire Line
-	6800 2150 6950 2150
-Wire Wire Line
-	7800 2150 8000 2150
-Text GLabel 6900 4600 2    50   Output ~ 0
+	10400 1150 10600 1150
+Text GLabel 6150 5950 2    50   Output ~ 0
 M1S
 Wire Wire Line
-	6800 4600 6900 4600
-Text GLabel 6800 2250 0    50   Input ~ 0
+	6050 5950 6150 5950
+Text GLabel 9400 1250 0    50   Input ~ 0
 M1S
 Wire Wire Line
-	6800 2250 6950 2250
-Text GLabel 7800 2250 0    50   Input ~ 0
+	9400 1250 9550 1250
+Text GLabel 10400 1250 0    50   Input ~ 0
 M2S
 Wire Wire Line
-	7800 2250 8000 2250
-Text GLabel 6200 4700 0    50   Output ~ 0
+	10400 1250 10600 1250
+Text GLabel 5450 6050 0    50   Output ~ 0
 M2S
 Wire Wire Line
-	6300 4700 6200 4700
+	5550 6050 5450 6050
 Wire Wire Line
 	4850 2150 4850 2500
 Wire Wire Line
 	4950 2550 5000 2550
 Wire Wire Line
 	4950 2150 4950 2550
-Text GLabel 6900 4300 2    50   Input ~ 0
+Text GLabel 6150 5650 2    50   Input ~ 0
 RCS
 Wire Wire Line
-	6900 4300 6800 4300
+	6150 5650 6050 5650
 Text GLabel 2650 2650 0    50   Input ~ 0
 RCS
 Wire Notes Line
@@ -475,18 +457,100 @@ Wire Wire Line
 $Comp
 L axis2-symbols:axis2-frame U3
 U 1 1 6076B53D
-P 7250 2900
-F 0 "U3" H 7428 3046 50  0000 L CNN
-F 1 "axis2-frame" H 7428 2955 50  0000 L CNN
-F 2 "axis2:axis2-footprint" H 7250 2900 50  0001 C CNN
-F 3 "" H 7250 2900 50  0001 C CNN
-	1    7250 2900
+P 10000 1950
+F 0 "U3" H 10178 2096 50  0000 L CNN
+F 1 "axis2-frame" H 10178 2005 50  0000 L CNN
+F 2 "axis2:axis2-footprint" H 10000 1950 50  0001 C CNN
+F 3 "" H 10000 1950 50  0001 C CNN
+	1    10000 1950
 	1    0    0    -1  
 $EndComp
-NoConn ~ 6800 2050
-NoConn ~ 6800 2150
-NoConn ~ 7800 2050
-NoConn ~ 7800 2150
-NoConn ~ 5400 2450
-NoConn ~ 4850 2550
+NoConn ~ 9400 1150
+NoConn ~ 10400 1150
+Wire Wire Line
+	3350 1200 3350 1400
+Wire Wire Line
+	3250 1200 3250 1350
+Wire Wire Line
+	3350 1400 3400 1400
+Wire Wire Line
+	3400 1400 3400 1450
+Text Label 9300 1050 2    50   ~ 0
+GND
+Wire Wire Line
+	9300 1050 9550 1050
+Text Label 10350 1050 2    50   ~ 0
+GND
+Wire Wire Line
+	10350 1050 10600 1050
+$Comp
+L dk_Power-Relays-Over-2-Amps:G5LE-14_DC5 RLY1
+U 1 1 608096DF
+P 7950 2700
+F 0 "RLY1" H 8278 2746 50  0000 L CNN
+F 1 "G5LE-14_DC5" H 8278 2655 50  0000 L CNN
+F 2 "Relay_THT:Relay_SPDT_Omron-G5LE-1" H 8150 2900 50  0001 L CNN
+F 3 "https://omronfs.omron.com/en_US/ecb/products/pdf/en-g5le.pdf" H 8150 3000 60  0001 L CNN
+F 4 "Z1011-ND" H 8150 3100 60  0001 L CNN "Digi-Key_PN"
+F 5 "G5LE-14 DC5" H 8150 3200 60  0001 L CNN "MPN"
+F 6 "Relays" H 8150 3300 60  0001 L CNN "Category"
+F 7 "Power Relays, Over 2 Amps" H 8150 3400 60  0001 L CNN "Family"
+F 8 "https://omronfs.omron.com/en_US/ecb/products/pdf/en-g5le.pdf" H 8150 3500 60  0001 L CNN "DK_Datasheet_Link"
+F 9 "/product-detail/en/omron-electronics-inc-emc-div/G5LE-14-DC5/Z1011-ND/280371" H 8150 3600 60  0001 L CNN "DK_Detail_Page"
+F 10 "RELAY GEN PURPOSE SPDT 10A 5V" H 8150 3700 60  0001 L CNN "Description"
+F 11 "Omron Electronics Inc-EMC Div" H 8150 3800 60  0001 L CNN "Manufacturer"
+F 12 "Active" H 8150 3900 60  0001 L CNN "Status"
+	1    7950 2700
+	1    0    0    -1  
+$EndComp
+Text GLabel 7050 3000 0    50   Input ~ 0
+GPIO32
+Text GLabel 8050 3200 3    50   Input ~ 0
++12V
+Wire Wire Line
+	8050 3200 8050 3000
+Text GLabel 8150 2200 1    50   Output ~ 0
++12VM
+Wire Wire Line
+	8150 2400 8150 2200
+NoConn ~ 7950 2400
+Text GLabel 1900 5950 0    50   Output ~ 0
+GPIO32
+Wire Wire Line
+	2050 5950 1900 5950
+$Comp
+L Device:D_ALT D1
+U 1 1 60836FCC
+P 7350 2750
+F 0 "D1" V 7304 2830 50  0000 L CNN
+F 1 "D_ALT" V 7395 2830 50  0000 L CNN
+F 2 "Diode_THT:D_DO-34_SOD68_P7.62mm_Horizontal" H 7350 2750 50  0001 C CNN
+F 3 "~" H 7350 2750 50  0001 C CNN
+	1    7350 2750
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	7350 2600 7350 2400
+Connection ~ 7350 2400
+Wire Wire Line
+	7350 2400 7750 2400
+Wire Wire Line
+	7350 2900 7350 3000
+Connection ~ 7350 3000
+Wire Wire Line
+	7350 3000 7750 3000
+Text GLabel 7000 2400 0    50   Input ~ 0
++3V3
+Wire Wire Line
+	7000 2400 7350 2400
+Wire Wire Line
+	7050 3000 7350 3000
+Wire Notes Line
+	6600 3600 9050 3600
+Wire Notes Line
+	9050 3600 9050 700 
+Wire Notes Line
+	9050 700  6600 700 
+Wire Notes Line
+	6600 700  6600 3600
 $EndSCHEMATC

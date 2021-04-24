@@ -19,12 +19,12 @@ void sdrone_motors_task_init(motors_handle_t motors_handle) {
 
 	// Init motor left
 	motors_handle->motor[0].enabled = true;
-	motors_handle->motor[0].pin = GPIO_NUM_19;
+	motors_handle->motor[0].pin = GPIO_NUM_21;
 	motors_handle->motor[0].position = LEFT;
 
 	// Init motor right
 	motors_handle->motor[1].enabled = true;
-	motors_handle->motor[1].pin = GPIO_NUM_18;
+	motors_handle->motor[1].pin = GPIO_NUM_22;
 	motors_handle->motor[1].position = RIGHT;
 
 	printf("sdrone_motors_task_init::Init Motors\n");

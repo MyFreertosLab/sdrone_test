@@ -16,6 +16,8 @@
 #define MOTORS_FREQUENCY 16 // 16KHz
 #define MOTORS_PWM_FREQUENCY 490 // 490 Hz
 #define MOTORS_IGNORE_PIN (-1)
+#define MOTORS_SWITCH_ON_OFF_PIN GPIO_NUM_32
+#define MOTORS_SWITCH_ON_OFF_PIN_SEL GPIO_SEL_32
 
 // TODO: Define all positions from quad to opto
 typedef enum {

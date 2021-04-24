@@ -1,4 +1,4 @@
-(module gy-9250 (layer F.Cu) (tedit 607326E8)
+(module gy-9250 (layer F.Cu) (tedit 60804281)
   (fp_text reference REF** (at -6.35 12.7) (layer F.SilkS)
     (effects (font (size 1 1) (thickness 0.15)))
   )
@@ -69,4 +69,6 @@
   (pad 8 thru_hole circle (at -12.7 5.08) (size 1.524 1.524) (drill 0.762) (layers *.Cu *.Mask))
   (pad 9 thru_hole circle (at -12.7 7.62) (size 1.524 1.524) (drill 0.762) (layers *.Cu *.Mask))
   (pad 10 thru_hole circle (at -12.7 10.16) (size 1.524 1.524) (drill 0.762) (layers *.Cu *.Mask))
+  (pad 11 thru_hole circle (at -1.2 -11.6) (size 3 3) (drill 3) (layers *.Cu *.Mask))
+  (pad 12 thru_hole circle (at -1.2 9) (size 3 3) (drill 3) (layers *.Cu *.Mask))
 )
