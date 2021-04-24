@@ -4,9 +4,15 @@
 #include <esp_system.h>
 #include <motors.h>
 
+static mcpwm_dev_t *MCPWM[2] = {&MCPWM0, &MCPWM1};
 static mcpwm_generator_t motors_pwm_generator[MOTORS_MAX_NUM] = {
-		MCPWM0A, MCPWM0B, MCPWM1A, MCPWM1B,MCPWM2A, MCPWM2B,
-		MCPWM0A, MCPWM0B, MCPWM1A, MCPWM1B,MCPWM2A, MCPWM2B
+		MCPWM_GEN_A, MCPWM_GEN_B, MCPWM_GEN_A, MCPWM_GEN_B, MCPWM_GEN_A, MCPWM_GEN_B,
+		MCPWM_GEN_A, MCPWM_GEN_B, MCPWM_GEN_A, MCPWM_GEN_B, MCPWM_GEN_A, MCPWM_GEN_B
+};
+
+static mcpwm_timer_t motors_timers[MOTORS_MAX_NUM] = {
+		MCPWM_TIMER_0, MCPWM_TIMER_0, MCPWM_TIMER_1, MCPWM_TIMER_1, MCPWM_TIMER_2, MCPWM_TIMER_2,
+		MCPWM_TIMER_0, MCPWM_TIMER_0, MCPWM_TIMER_1, MCPWM_TIMER_1, MCPWM_TIMER_2, MCPWM_TIMER_2
 };
 
 float motors_get_duty_low(motors_handle_t motors_handle) {
@@ -30,26 +36,18 @@ esp_err_t motors_init_pwm_timer(motors_handle_t motors_handle, mcpwm_unit_t unit
     pwm_config.counter_mode = MCPWM_UP_COUNTER;
     pwm_config.duty_mode = MCPWM_DUTY_MODE_0;
     ESP_ERROR_CHECK(mcpwm_init(unit, timer, &pwm_config));
-
-    // set duty for all motors in the unit
-    uint8_t si = motors_get_mcpwm_motors_range(unit);
-    for(uint8_t i = 0; i < 6; i++) {
-      if(motors_handle->motor[i+si].enabled) {
-    	ESP_ERROR_CHECK(mcpwm_set_duty(unit, timer,motors_pwm_generator[i+si], duty));
-      }
-    }
     return ESP_OK;
 }
 
 esp_err_t motors_low_duty_motor(motors_handle_t motors_handle, uint8_t motor_indx) {
 	printf("motors: motors_low_duty_motor [%d]\n", motor_indx);
-	ESP_ERROR_CHECK(mcpwm_set_duty(motors_handle->motor[motor_indx].mcpwm, MCPWM_TIMER_0,motors_pwm_generator[motor_indx], motors_get_duty_low(motors_handle)));
+	ESP_ERROR_CHECK(mcpwm_set_duty(motors_handle->motor[motor_indx].mcpwm, motors_timers[motor_indx],motors_pwm_generator[motor_indx], motors_get_duty_low(motors_handle)));
 	return ESP_OK;
 }
 
 esp_err_t motors_high_duty_motor(motors_handle_t motors_handle, uint8_t motor_indx) {
-	printf("motors: motors_high_duty_motor [%d]\n", motor_indx);
-	ESP_ERROR_CHECK(mcpwm_set_duty(motors_handle->motor[motor_indx].mcpwm, MCPWM_TIMER_0,motors_pwm_generator[motor_indx],motors_get_duty_high(motors_handle)));
+	printf("motors: motors_high_duty_motor [%d], timer[%d], gen[%d]\n", motor_indx, motors_timers[motor_indx],motors_pwm_generator[motor_indx]);
+	ESP_ERROR_CHECK(mcpwm_set_duty(motors_handle->motor[motor_indx].mcpwm, motors_timers[motor_indx],motors_pwm_generator[motor_indx],motors_get_duty_high(motors_handle)));
 	return ESP_OK;
 }
 
@@ -78,7 +76,7 @@ esp_err_t motors_update_motors(motors_handle_t motors_handle) {
 	for (uint8_t i = 0; i < MOTORS_MAX_NUM; i++) {
 	  if (motors_handle->motor[i].enabled) {
 	    printf("motors: motors_update_motors[%d/%2.2f]\n", i, motors_handle->motor[i].duty_cycle);
-		ESP_ERROR_CHECK(mcpwm_set_duty(motors_handle->motor[i].mcpwm, MCPWM_TIMER_0,motors_pwm_generator[i],motors_handle->motor[i].duty_cycle));
+		ESP_ERROR_CHECK(mcpwm_set_duty(motors_handle->motor[i].mcpwm, motors_timers[i],motors_pwm_generator[i],motors_handle->motor[i].duty_cycle));
       }
 	}
 	return ESP_OK;
@@ -120,10 +118,18 @@ esp_err_t motors_init_mcpwm(motors_handle_t motors_handle, mcpwm_unit_t unit) {
     uint8_t si = motors_get_mcpwm_motors_range(unit);
 
     ESP_ERROR_CHECK(motors_init_pwm_timer(motors_handle, unit, MCPWM_TIMER_0));
+    ESP_ERROR_CHECK(motors_init_pwm_timer(motors_handle, unit, MCPWM_TIMER_1));
+    ESP_ERROR_CHECK(motors_init_pwm_timer(motors_handle, unit, MCPWM_TIMER_2));
+
+    // Sync timer 1 and timer 2 with timer 0
+    mcpwm_sync_enable(MCPWM_UNIT_0, MCPWM_TIMER_1, 1, 0);
+    mcpwm_sync_enable(MCPWM_UNIT_0, MCPWM_TIMER_2, 1, 0);
+    MCPWM[MCPWM_UNIT_0]->timer[MCPWM_TIMER_0].sync.out_sel = 1;
+
     for(uint8_t i = 0; i < 6; i++) {
       if(motors_handle->motor[i+si].enabled) {
         motors_handle->motor[i+si].mcpwm = unit;
-        motors_handle->motor[i+si].duty_cycle = mcpwm_get_duty(unit, MCPWM_TIMER_0,motors_pwm_generator[i+si]);
+        motors_handle->motor[i+si].duty_cycle = mcpwm_get_duty(unit, motors_timers[i+si], motors_pwm_generator[i+si]);
       }
     }
     printf("motors::motors_init_mcpwm: END\n");
@@ -203,6 +209,7 @@ esp_err_t motors_config(motors_handle_t motors_handle) {
 esp_err_t motors_init(motors_handle_t motors_handle) {
 	printf("motors: motors_init\n");
 	ESP_ERROR_CHECK(motors_switchoff(motors_handle));
+    vTaskDelay(500); //delay of 5s (at 100Hz)
 	ESP_ERROR_CHECK(motors_config(motors_handle));
 	ESP_ERROR_CHECK(motors_init_mcpwm(motors_handle, MCPWM_UNIT_0));
 	ESP_ERROR_CHECK(motors_init_mcpwm(motors_handle, MCPWM_UNIT_1));

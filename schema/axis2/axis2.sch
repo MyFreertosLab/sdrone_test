@@ -486,34 +486,34 @@ Wire Wire Line
 $Comp
 L dk_Power-Relays-Over-2-Amps:G5LE-14_DC5 RLY1
 U 1 1 608096DF
-P 7950 2700
-F 0 "RLY1" H 8278 2746 50  0000 L CNN
-F 1 "G5LE-14_DC5" H 8278 2655 50  0000 L CNN
-F 2 "Relay_THT:Relay_SPDT_Omron-G5LE-1" H 8150 2900 50  0001 L CNN
-F 3 "https://omronfs.omron.com/en_US/ecb/products/pdf/en-g5le.pdf" H 8150 3000 60  0001 L CNN
-F 4 "Z1011-ND" H 8150 3100 60  0001 L CNN "Digi-Key_PN"
-F 5 "G5LE-14 DC5" H 8150 3200 60  0001 L CNN "MPN"
-F 6 "Relays" H 8150 3300 60  0001 L CNN "Category"
-F 7 "Power Relays, Over 2 Amps" H 8150 3400 60  0001 L CNN "Family"
-F 8 "https://omronfs.omron.com/en_US/ecb/products/pdf/en-g5le.pdf" H 8150 3500 60  0001 L CNN "DK_Datasheet_Link"
-F 9 "/product-detail/en/omron-electronics-inc-emc-div/G5LE-14-DC5/Z1011-ND/280371" H 8150 3600 60  0001 L CNN "DK_Detail_Page"
-F 10 "RELAY GEN PURPOSE SPDT 10A 5V" H 8150 3700 60  0001 L CNN "Description"
-F 11 "Omron Electronics Inc-EMC Div" H 8150 3800 60  0001 L CNN "Manufacturer"
-F 12 "Active" H 8150 3900 60  0001 L CNN "Status"
-	1    7950 2700
+P 8150 2300
+F 0 "RLY1" H 8478 2346 50  0000 L CNN
+F 1 "G5LE-14_DC5" H 8478 2255 50  0000 L CNN
+F 2 "Relay_THT:Relay_SPDT_Omron-G5LE-1" H 8350 2500 50  0001 L CNN
+F 3 "https://omronfs.omron.com/en_US/ecb/products/pdf/en-g5le.pdf" H 8350 2600 60  0001 L CNN
+F 4 "Z1011-ND" H 8350 2700 60  0001 L CNN "Digi-Key_PN"
+F 5 "G5LE-14 DC5" H 8350 2800 60  0001 L CNN "MPN"
+F 6 "Relays" H 8350 2900 60  0001 L CNN "Category"
+F 7 "Power Relays, Over 2 Amps" H 8350 3000 60  0001 L CNN "Family"
+F 8 "https://omronfs.omron.com/en_US/ecb/products/pdf/en-g5le.pdf" H 8350 3100 60  0001 L CNN "DK_Datasheet_Link"
+F 9 "/product-detail/en/omron-electronics-inc-emc-div/G5LE-14-DC5/Z1011-ND/280371" H 8350 3200 60  0001 L CNN "DK_Detail_Page"
+F 10 "RELAY GEN PURPOSE SPDT 10A 5V" H 8350 3300 60  0001 L CNN "Description"
+F 11 "Omron Electronics Inc-EMC Div" H 8350 3400 60  0001 L CNN "Manufacturer"
+F 12 "Active" H 8350 3500 60  0001 L CNN "Status"
+	1    8150 2300
 	1    0    0    -1  
 $EndComp
-Text GLabel 7050 3000 0    50   Input ~ 0
+Text GLabel 7200 2900 0    50   Input ~ 0
 GPIO32
-Text GLabel 8050 3200 3    50   Input ~ 0
+Text GLabel 8250 2800 3    50   Input ~ 0
 +12V
 Wire Wire Line
-	8050 3200 8050 3000
-Text GLabel 8150 2200 1    50   Output ~ 0
+	8250 2800 8250 2600
+Text GLabel 8350 1800 1    50   Output ~ 0
 +12VM
 Wire Wire Line
-	8150 2400 8150 2200
-NoConn ~ 7950 2400
+	8350 2000 8350 1800
+NoConn ~ 8150 2000
 Text GLabel 1900 5950 0    50   Output ~ 0
 GPIO32
 Wire Wire Line
@@ -521,30 +521,28 @@ Wire Wire Line
 $Comp
 L Device:D_ALT D1
 U 1 1 60836FCC
-P 7350 2750
-F 0 "D1" V 7304 2830 50  0000 L CNN
-F 1 "D_ALT" V 7395 2830 50  0000 L CNN
-F 2 "Diode_THT:D_DO-34_SOD68_P7.62mm_Horizontal" H 7350 2750 50  0001 C CNN
-F 3 "~" H 7350 2750 50  0001 C CNN
-	1    7350 2750
+P 7550 2350
+F 0 "D1" V 7504 2430 50  0000 L CNN
+F 1 "D_ALT" V 7595 2430 50  0000 L CNN
+F 2 "Diode_THT:D_DO-34_SOD68_P7.62mm_Horizontal" H 7550 2350 50  0001 C CNN
+F 3 "~" H 7550 2350 50  0001 C CNN
+	1    7550 2350
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	7350 2600 7350 2400
-Connection ~ 7350 2400
+	7550 2200 7550 2000
+Connection ~ 7550 2000
 Wire Wire Line
-	7350 2400 7750 2400
+	7550 2000 7950 2000
 Wire Wire Line
-	7350 2900 7350 3000
-Connection ~ 7350 3000
+	7550 2500 7550 2600
+Connection ~ 7550 2600
 Wire Wire Line
-	7350 3000 7750 3000
-Text GLabel 7000 2400 0    50   Input ~ 0
+	7550 2600 7950 2600
+Text GLabel 7200 2000 0    50   Input ~ 0
 +3V3
 Wire Wire Line
-	7000 2400 7350 2400
-Wire Wire Line
-	7050 3000 7350 3000
+	7200 2000 7550 2000
 Wire Notes Line
 	6600 3600 9050 3600
 Wire Notes Line
@@ -553,4 +551,23 @@ Wire Notes Line
 	9050 700  6600 700 
 Wire Notes Line
 	6600 700  6600 3600
+$Comp
+L Transistor_BJT:BC547 Q1
+U 1 1 60841F0D
+P 7400 2900
+F 0 "Q1" H 7591 2946 50  0000 L CNN
+F 1 "BC547" H 7591 2855 50  0000 L CNN
+F 2 "Package_TO_SOT_THT:TO-92" H 7600 2825 50  0001 L CIN
+F 3 "https://www.onsemi.com/pub/Collateral/BC550-D.pdf" H 7400 2900 50  0001 L CNN
+	1    7400 2900
+	1    0    0    -1  
+$EndComp
+Text Label 6950 3100 0    50   ~ 0
+GND
+Wire Wire Line
+	7500 2700 7500 2600
+Wire Wire Line
+	7500 2600 7550 2600
+Wire Wire Line
+	7500 3100 6950 3100
 $EndSCHEMATC

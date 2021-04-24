@@ -25,6 +25,7 @@
 *.bmp     binary
 *.pdf     binary
 *.png     binary
+*.zip     binary
 
 *.xslx    binary
 *.xlsx    binary

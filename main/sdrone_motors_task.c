@@ -13,29 +13,10 @@
 #include <esp_system.h>
 #include <motors.h>
 
-void sdrone_motors_task_init(motors_handle_t motors_handle) {
-	printf("sdrone_motors_task_init::Started\n");
-	memset(motors_handle, 0, sizeof(*motors_handle));
-
-	// Init motor left
-	motors_handle->motor[0].enabled = true;
-	motors_handle->motor[0].pin = GPIO_NUM_21;
-	motors_handle->motor[0].position = LEFT;
-
-	// Init motor right
-	motors_handle->motor[1].enabled = true;
-	motors_handle->motor[1].pin = GPIO_NUM_22;
-	motors_handle->motor[1].position = RIGHT;
-
-	printf("sdrone_motors_task_init::Init Motors\n");
-	ESP_ERROR_CHECK(motors_init(motors_handle));
-}
-
 void sdrone_motors_task(void *arg) {
 	motors_t motors;
 	motors_handle_t motors_handle = &motors;
-	sdrone_motors_task_init(motors_handle);
-    vTaskDelay(100); //delay of 1s
+	ESP_ERROR_CHECK(motors_init(motors_handle));
 
 	printf("sdrone_motors_task_init::Arm motors without program esc\n");
 	ESP_ERROR_CHECK(motors_arm(motors_handle));
