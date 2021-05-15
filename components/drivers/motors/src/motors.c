@@ -237,13 +237,13 @@ esp_err_t motors_disarm(motors_handle_t motors_handle) {
 }
 esp_err_t motors_switchoff(motors_handle_t motors_handle) {
 	printf("motors: motors_switchoff\n");
-    gpio_set_level(MOTORS_SWITCH_ON_OFF_PIN, 0);
+    gpio_set_level(MOTORS_SWITCH_ON_OFF_PIN, MOTORS_SWITCH_OFF);
     motors_handle->status = OFF;
 	return ESP_OK;
 }
 esp_err_t motors_switchon(motors_handle_t motors_handle) {
 	printf("motors: motors_switchon\n");
-    gpio_set_level(MOTORS_SWITCH_ON_OFF_PIN, 1);
+    gpio_set_level(MOTORS_SWITCH_ON_OFF_PIN, MOTORS_SWITCH_ON);
 	motors_handle->status = ON_DISARMED;
 	return ESP_OK;
 }

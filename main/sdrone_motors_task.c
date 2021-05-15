@@ -28,14 +28,14 @@ void sdrone_motors_task(void *arg) {
 	while(true) {
 		printf("Cycle motors\n");
 		//TODO: aggiornare il duty
-		if(motors_handle->motor[0].duty_cycle >= duty_max) {
+		if(motors_handle->motor[2].duty_cycle >= duty_max) {
 			increment = -1.0f;
 		}
-		if(motors_handle->motor[0].duty_cycle <= duty_min) {
+		if(motors_handle->motor[2].duty_cycle <= duty_min) {
 			increment = 1.0f;
 		}
-		motors_handle->motor[0].duty_cycle += increment;
-		motors_handle->motor[1].duty_cycle += increment;
+		motors_handle->motor[2].duty_cycle += increment;
+		motors_handle->motor[3].duty_cycle += increment;
 		motors_update(motors_handle);
 	    vTaskDelay(100);
 	};

@@ -18,6 +18,9 @@
 #define MOTORS_IGNORE_PIN (-1)
 #define MOTORS_SWITCH_ON_OFF_PIN GPIO_NUM_32
 #define MOTORS_SWITCH_ON_OFF_PIN_SEL GPIO_SEL_32
+#define MOTORS_SWITCH_ON  0
+#define MOTORS_SWITCH_OFF 1
+
 
 // TODO: Define all positions from quad to opto
 typedef enum {
