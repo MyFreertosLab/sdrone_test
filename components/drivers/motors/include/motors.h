@@ -21,6 +21,8 @@
 #define MOTORS_SWITCH_ON  0
 #define MOTORS_SWITCH_OFF 1
 
+//#define MOTORS_FRAME_HORIZONTAL_HEXACOPTER
+#define MOTORS_FRAME_TWO_HORIZONTAL_AXIS
 
 // TODO: Define all positions from quad to opto
 typedef enum {

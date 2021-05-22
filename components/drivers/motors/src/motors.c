@@ -145,12 +145,10 @@ esp_err_t motors_init_mcpwm(motors_handle_t motors_handle, mcpwm_unit_t unit) {
  *         / \
  *        6   4
  */
-esp_err_t motors_config(motors_handle_t motors_handle) {
-	printf("motors_config::Started\n");
-	memset(motors_handle, 0, sizeof(*motors_handle));
+esp_err_t motors_config_horizontal_hexacopter(motors_handle_t motors_handle) {
+	printf("motors_config_horizontal_hexacopter::Started\n");
 
 	// Config switchon/off pin and frequency
-	motors_handle->switch_on_off_pin = MOTORS_SWITCH_ON_OFF_PIN;
 	motors_handle->frequency = MOTORS_PWM_FREQUENCY;
 
 	// Config motor left
@@ -190,16 +188,50 @@ esp_err_t motors_config(motors_handle_t motors_handle) {
     motors_handle->motor[5].num = 4;
 
 
+	printf("motors_config_horizontal_hexacopter::Ended\n");
+
+	return ESP_OK;
+}
+/*
+ * Two Horizontal Axis Test Frame (pitch rotation used to test motors controller algorithm)
+ *
+ *      2---+---1
+ *         / \
+ *        -----
+ */
+esp_err_t motors_config_two_horizontal_axis(motors_handle_t motors_handle) {
+	printf("motors_config_two_horizontal_axis::Started\n");
+
+	// Config switchon/off pin and frequency
+	motors_handle->frequency = MOTORS_PWM_FREQUENCY;
+
+	// Config motor left
+	motors_handle->motor[0].enabled = true;
+	motors_handle->motor[0].pin = GPIO_NUM_18;
+	motors_handle->motor[0].position = LEFT;
+    motors_handle->motor[0].num = 2;
+
+	// Config motor right
+	motors_handle->motor[1].enabled = true;
+	motors_handle->motor[1].pin = GPIO_NUM_19;
+	motors_handle->motor[1].position = RIGHT;
+    motors_handle->motor[1].num = 1;
+
+	printf("motors_config_two_horizontal_axis::Ended\n");
+
+	return ESP_OK;
+}
+esp_err_t motors_config_switchonoff_pin(motors_handle_t motors_handle) {
+	printf("motors_config_switchonoff_pin::Started\n");
     // Gpio Switch On/Off pin
+	motors_handle->switch_on_off_pin = MOTORS_SWITCH_ON_OFF_PIN;
     gpio_pulldown_en(MOTORS_SWITCH_ON_OFF_PIN);
     gpio_config_t gp;
     gp.intr_type = GPIO_INTR_DISABLE;
     gp.mode = GPIO_MODE_OUTPUT;
     gp.pin_bit_mask = MOTORS_SWITCH_ON_OFF_PIN_SEL;
     gpio_config(&gp);
-
-	printf("motors_config::Init Motors\n");
-
+	printf("motors_config_switchonoff_pin::Ended\n");
 	return ESP_OK;
 }
 
@@ -208,9 +240,20 @@ esp_err_t motors_config(motors_handle_t motors_handle) {
  ************************************************************************/
 esp_err_t motors_init(motors_handle_t motors_handle) {
 	printf("motors: motors_init\n");
+	memset(motors_handle, 0, sizeof(*motors_handle));
+
+	ESP_ERROR_CHECK(motors_config_switchonoff_pin(motors_handle));
 	ESP_ERROR_CHECK(motors_switchoff(motors_handle));
     vTaskDelay(500); //delay of 5s (at 100Hz)
-	ESP_ERROR_CHECK(motors_config(motors_handle));
+
+#ifdef MOTORS_FRAME_HORIZONTAL_HEXACOPTER
+	ESP_ERROR_CHECK(motors_config_horizontal_hexacopter(motors_handle));
+#else
+#ifdef MOTORS_FRAME_TWO_HORIZONTAL_AXIS
+	ESP_ERROR_CHECK(motors_config_two_horizontal_axis(motors_handle));
+#endif
+#endif
+
 	ESP_ERROR_CHECK(motors_init_mcpwm(motors_handle, MCPWM_UNIT_0));
 	ESP_ERROR_CHECK(motors_init_mcpwm(motors_handle, MCPWM_UNIT_1));
     vTaskDelay(500); //delay of 5s (at 100Hz)

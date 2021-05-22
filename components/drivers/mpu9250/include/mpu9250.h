@@ -477,6 +477,19 @@ typedef uint8_t mpu9250_int_status_t;
 /*********************************
 ******** MPU9250 HANDLE **********
 *********************************/
+typedef enum {
+        IMU_TXRX_IGNORE = 0,
+        IMU_TXRX_TRANSMITTED = 1,
+        IMU_TXRX_RECEIVED = 2
+} imu_txrx_signal_t;
+typedef struct {
+    mpu9250_raw_data_t raw_data;
+    mpu9250_accel_t accel;
+    mpu9250_gyro_t gyro;
+	double attitude[3];
+	volatile imu_txrx_signal_t txrx_signal;
+} mpu9250_data_t;
+
 typedef struct mpu9250_init_s {
 	spi_bus_config_t buscfg;
 	spi_device_interface_config_t devcfg;
@@ -489,14 +502,7 @@ typedef struct mpu9250_init_s {
 
     // MPU9250 id
     uint8_t whoami;
-
-    mpu9250_raw_data_t raw_data;
-
-    mpu9250_accel_t accel;
-    mpu9250_gyro_t gyro;
-
-	double attitude[3];
-
+    mpu9250_data_t data;
 } mpu9250_init_t;
 
 typedef mpu9250_init_t* mpu9250_handle_t;

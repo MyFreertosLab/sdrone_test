@@ -12,32 +12,102 @@
 #include <freertos/task.h>
 #include <esp_system.h>
 #include <motors.h>
+#include <sdrone_motors_task.h>
+
+void sdrone_motors_controller_init(
+		sdrone_motors_state_handle_t sdrone_motors_state_handle) {
+	printf("sdrone_motors_controller_init init initial state and motors\n");
+	memset(sdrone_motors_state_handle, 0, sizeof(*sdrone_motors_state_handle));
+	ESP_ERROR_CHECK(motors_init(&(sdrone_motors_state_handle->motors)));
+	sdrone_motors_state_handle->motors_task_handle =
+			xTaskGetCurrentTaskHandle();
+	printf(
+			"sdrone_motors_controller_init initial state and motors initialized\n");
+}
+
+esp_err_t sdrone_motors_two_horizontal_axis_control(
+		sdrone_motors_state_handle_t sdrone_motors_state_handle) {
+	return ESP_OK;
+}
+esp_err_t sdrone_motors_horizontal_hexacopter_control(
+		sdrone_motors_state_handle_t sdrone_motors_state_handle) {
+	return ESP_OK;
+}
+void sdrone_motors_controller_cycle(
+		sdrone_motors_state_handle_t sdrone_motors_state_handle) {
+	motors_handle_t motors_handle = &(sdrone_motors_state_handle->motors);
+	printf("sdrone_motors_task_init::Arm motors\n");
+	ESP_ERROR_CHECK(motors_arm(motors_handle));
+	vTaskDelay(pdMS_TO_TICKS(10));
+
+	/* TODO:
+	 * 1) configurare il timer0 in modo da ricevere un interrupt prima che inizi la nuova fase
+	 * 2) ricevere notifica da isr
+	 * 3) ricevuta la notifica, calcolare il valore Y(i+1) ed eseguire update motors
+	 *    - update motors deve avvenire prima dell'inizio della fase successiva.
+	 *    - quindi il task deve avere priorità massima
+	 */
+	while (true) {
+		// Take Notify at end of duty_cycle
+		if (ulTaskNotifyTake( pdTRUE, pdMS_TO_TICKS(10))
+				== sdrone_motors_state_handle->controller_driver_id) {
+            printf("motors received notify\n");
+			if (sdrone_motors_state_handle->input.isCommand) {
+				switch (sdrone_motors_state_handle->input.command.type) {
+				case MOTORS_ARM: {
+					ESP_ERROR_CHECK(motors_arm(motors_handle));
+					break;
+				}
+				case MOTORS_DISARM: {
+					ESP_ERROR_CHECK(motors_disarm(motors_handle));
+					break;
+				}
+				case MOTORS_SWITCHOFF: {
+					ESP_ERROR_CHECK(motors_switchoff(motors_handle));
+					break;
+				}
+				case MOTORS_SWITCHON: {
+					ESP_ERROR_CHECK(motors_switchon(motors_handle));
+					break;
+				}
+				default: {
+					printf(
+							"ERROR: sdrone_motors_controller_cycle::command %d unknown for motors",
+							sdrone_motors_state_handle->input.command.type);
+				}
+				}
+			} else if (sdrone_motors_state_handle->input.data.tx_rx_flag
+					== MOTORS_TXRX_TRANSMITTED) {
+				/*
+				 * load input data to local var
+				 */
+				sdrone_motors_state_handle->input.data.tx_rx_flag =
+						MOTORS_TXRX_RECEIVED;
+			}
+			/*
+			 * calc Y(i) for each motor
+			 * calc duty_cycle for each motor
+			 * not interrompible
+			 *   update motors
+			 */
+
+#ifdef MOTORS_FRAME_HORIZONTAL_HEXACOPTER
+	      ESP_ERROR_CHECK(motors_config_horizontal_hexacopter_control(sdrone_motors_state_handle));
+#else
+#ifdef MOTORS_FRAME_TWO_HORIZONTAL_AXIS
+			ESP_ERROR_CHECK(
+					sdrone_motors_two_horizontal_axis_control(
+							sdrone_motors_state_handle));
+#endif
+#endif
+		}
+	}
+}
 
 void sdrone_motors_task(void *arg) {
-	motors_t motors;
-	motors_handle_t motors_handle = &motors;
-	ESP_ERROR_CHECK(motors_init(motors_handle));
-
-	printf("sdrone_motors_task_init::Arm motors without program esc\n");
-	ESP_ERROR_CHECK(motors_arm(motors_handle));
-
-    vTaskDelay(10); //delay of 1/10s
-    float duty_min = 40.0f;
-    float duty_max = 99.0f;
-    float increment = 1.0f;
-	while(true) {
-		printf("Cycle motors\n");
-		//TODO: aggiornare il duty
-		if(motors_handle->motor[2].duty_cycle >= duty_max) {
-			increment = -1.0f;
-		}
-		if(motors_handle->motor[2].duty_cycle <= duty_min) {
-			increment = 1.0f;
-		}
-		motors_handle->motor[2].duty_cycle += increment;
-		motors_handle->motor[3].duty_cycle += increment;
-		motors_update(motors_handle);
-	    vTaskDelay(100);
-	};
+	sdrone_motors_state_handle_t sdrone_motors_state_handle =
+			(sdrone_motors_state_handle_t) arg;
+	sdrone_motors_controller_init(sdrone_motors_state_handle);
+	sdrone_motors_controller_cycle(sdrone_motors_state_handle);
 
 }

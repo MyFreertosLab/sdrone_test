@@ -62,8 +62,8 @@ esp_err_t mpu9250_init(mpu9250_handle_t mpu9250_handle) {
 	mpu9250_handle->data_ready_task_handle=xTaskGetCurrentTaskHandle();
 
 	for(uint8_t i = 0; i < 3; i++) {
-		mpu9250_cb_init(&mpu9250_handle->accel.cb[i]);
-		mpu9250_cb_init(&mpu9250_handle->gyro.cb[i]);
+		mpu9250_cb_init(&mpu9250_handle->data.accel.cb[i]);
+		mpu9250_cb_init(&mpu9250_handle->data.gyro.cb[i]);
 	}
 
     // set Configuration Register
@@ -95,9 +95,9 @@ esp_err_t mpu9250_init(mpu9250_handle_t mpu9250_handle) {
 	printf("MPU9250: Enable Interrupts\n");
     ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_INT_ENABLE, 0x01)); // data ready int
 
-    mpu9250_handle->attitude[X_POS] = 0.0f;
-    mpu9250_handle->attitude[Y_POS] = 0.0f;
-    mpu9250_handle->attitude[Z_POS] = 1.0f;
+    mpu9250_handle->data.attitude[X_POS] = 0.0f;
+    mpu9250_handle->data.attitude[Y_POS] = 0.0f;
+    mpu9250_handle->data.attitude[Z_POS] = 1.0f;
 
 	// prepare GPIO Interrupt
 	printf("MPU9250: Gpio interrupt pin [%d]\n", mpu9250_handle->int_pin);
@@ -152,39 +152,38 @@ esp_err_t mpu9250_test_connection(mpu9250_handle_t mpu9250_handle) {
 esp_err_t mpu9250_load_raw_data(mpu9250_handle_t mpu9250_handle) {
 	uint8_t buff[26];
 	esp_err_t ret = mpu9250_read_buff(mpu9250_handle, MPU9250_ACCEL_XOUT_H, buff, 26*8);
-	mpu9250_handle->raw_data.data_s_xyz.accel_data_x = ((buff[0] << 8) | buff[1]);
-	mpu9250_handle->raw_data.data_s_xyz.accel_data_y = ((buff[2] << 8) | buff[3]);
-	mpu9250_handle->raw_data.data_s_xyz.accel_data_z = ((buff[4] << 8) | buff[5]);
-	mpu9250_handle->raw_data.data_s_xyz.temp_data = ((buff[6] << 8) | buff[7]);
-	mpu9250_handle->raw_data.data_s_xyz.gyro_data_x = ((buff[8] << 8) | buff[9]);
-	mpu9250_handle->raw_data.data_s_xyz.gyro_data_y = ((buff[10] << 8) | buff[11]);
-	mpu9250_handle->raw_data.data_s_xyz.gyro_data_z = ((buff[12] << 8) | buff[13]);
+	mpu9250_handle->data.raw_data.data_s_xyz.accel_data_x = ((buff[0] << 8) | buff[1]);
+	mpu9250_handle->data.raw_data.data_s_xyz.accel_data_y = ((buff[2] << 8) | buff[3]);
+	mpu9250_handle->data.raw_data.data_s_xyz.accel_data_z = ((buff[4] << 8) | buff[5]);
+	mpu9250_handle->data.raw_data.data_s_xyz.temp_data = ((buff[6] << 8) | buff[7]);
+	mpu9250_handle->data.raw_data.data_s_xyz.gyro_data_x = ((buff[8] << 8) | buff[9]);
+	mpu9250_handle->data.raw_data.data_s_xyz.gyro_data_y = ((buff[10] << 8) | buff[11]);
+	mpu9250_handle->data.raw_data.data_s_xyz.gyro_data_z = ((buff[12] << 8) | buff[13]);
 
 	for(uint8_t i = 0; i < 3; i++) {
-		mpu9250_cb_add(&mpu9250_handle->accel.cb[i], mpu9250_handle->raw_data.data_s_vector.accel[i]);
-		mpu9250_cb_add(&mpu9250_handle->gyro.cb[i], mpu9250_handle->raw_data.data_s_vector.gyro[i]);
+		mpu9250_cb_add(&mpu9250_handle->data.accel.cb[i], mpu9250_handle->data.raw_data.data_s_vector.accel[i]);
+		mpu9250_cb_add(&mpu9250_handle->data.gyro.cb[i], mpu9250_handle->data.raw_data.data_s_vector.gyro[i]);
 	}
-
 	return ret;
 }
 esp_err_t mpu9250_calc_gravity(mpu9250_handle_t mpu9250_handle) {
-	double cx=cos(mpu9250_handle->gyro.rpy.xyz.x);
-	double cy=cos(mpu9250_handle->gyro.rpy.xyz.y);
-	double sx=sin(mpu9250_handle->gyro.rpy.xyz.x);
-	double sy=sin(mpu9250_handle->gyro.rpy.xyz.y);
+	double cx=cos(mpu9250_handle->data.gyro.rpy.xyz.x);
+	double cy=cos(mpu9250_handle->data.gyro.rpy.xyz.y);
+	double sx=sin(mpu9250_handle->data.gyro.rpy.xyz.x);
+	double sy=sin(mpu9250_handle->data.gyro.rpy.xyz.y);
 	// roll,pitch,yaw from gyro are axis rotation
 	// then attitude vector rotation is inverse
-	mpu9250_handle->attitude[X_POS] = -sy;
-	mpu9250_handle->attitude[Y_POS] = cy*sx;
-	mpu9250_handle->attitude[Z_POS] = cy*cx;
+	mpu9250_handle->data.attitude[X_POS] = -sy;
+	mpu9250_handle->data.attitude[Y_POS] = cy*sx;
+	mpu9250_handle->data.attitude[Z_POS] = cy*cx;
 
 	return ESP_OK;
 }
 esp_err_t mpu9250_calc_rpy(mpu9250_handle_t mpu9250_handle) {
 
 	// roll pitch fusion (accel + gyro)
-	mpu9250_handle->gyro.rpy.xyz.x += 0.003*(mpu9250_handle->accel.rpy.xyz.x - mpu9250_handle->gyro.rpy.xyz.x);
-	mpu9250_handle->gyro.rpy.xyz.y += 0.003*(mpu9250_handle->accel.rpy.xyz.y - mpu9250_handle->gyro.rpy.xyz.y);
+	mpu9250_handle->data.gyro.rpy.xyz.x += 0.003*(mpu9250_handle->data.accel.rpy.xyz.x - mpu9250_handle->data.gyro.rpy.xyz.x);
+	mpu9250_handle->data.gyro.rpy.xyz.y += 0.003*(mpu9250_handle->data.accel.rpy.xyz.y - mpu9250_handle->data.gyro.rpy.xyz.y);
 
 	return ESP_OK;
 }

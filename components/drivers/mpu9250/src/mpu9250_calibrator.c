@@ -29,14 +29,14 @@ static esp_err_t mpu9250_cal_display_messages(mpu9250_handle_t mpu9250_handle, u
 		ESP_ERROR_CHECK(mpu9250_load_raw_data(mpu9250_handle));
 		if(i%100 == 0) {
 			printf("Acc [%d][%d][%d]\n",
-					mpu9250_handle->raw_data.data_s_xyz.accel_data_x,
-					mpu9250_handle->raw_data.data_s_xyz.accel_data_y,
-					mpu9250_handle->raw_data.data_s_xyz.accel_data_z
+					mpu9250_handle->data.raw_data.data_s_xyz.accel_data_x,
+					mpu9250_handle->data.raw_data.data_s_xyz.accel_data_y,
+					mpu9250_handle->data.raw_data.data_s_xyz.accel_data_z
 				  );
 			printf("Gyro [%d][%d][%d]\n",
-					mpu9250_handle->raw_data.data_s_xyz.gyro_data_x,
-					mpu9250_handle->raw_data.data_s_xyz.gyro_data_y,
-					mpu9250_handle->raw_data.data_s_xyz.gyro_data_z
+					mpu9250_handle->data.raw_data.data_s_xyz.gyro_data_x,
+					mpu9250_handle->data.raw_data.data_s_xyz.gyro_data_y,
+					mpu9250_handle->data.raw_data.data_s_xyz.gyro_data_z
 				  );
 		}
 	}
@@ -47,15 +47,15 @@ static esp_err_t mpu9250_cal_load_offset(mpu9250_cal_handle_t mpu9250_cal_handle
 	ESP_ERROR_CHECK(mpu9250_acc_load_offset(mpu9250_cal_handle->mpu9250_handle));
 	ESP_ERROR_CHECK(mpu9250_gyro_load_offset(mpu9250_cal_handle->mpu9250_handle));
 
-	printf("Acc offsets: [%d][%d][%d]\n", mpu9250_cal_handle->mpu9250_handle->accel.cal.offset.xyz.x, mpu9250_cal_handle->mpu9250_handle->accel.cal.offset.xyz.y,mpu9250_cal_handle->mpu9250_handle->accel.cal.offset.xyz.z);
-	printf("Gyro offsets: [%d][%d][%d]\n", mpu9250_cal_handle->mpu9250_handle->gyro.cal.offset.xyz.x, mpu9250_cal_handle->mpu9250_handle->gyro.cal.offset.xyz.y,mpu9250_cal_handle->mpu9250_handle->gyro.cal.offset.xyz.z);
+	printf("Acc offsets: [%d][%d][%d]\n", mpu9250_cal_handle->mpu9250_handle->data.accel.cal.offset.xyz.x, mpu9250_cal_handle->mpu9250_handle->data.accel.cal.offset.xyz.y,mpu9250_cal_handle->mpu9250_handle->data.accel.cal.offset.xyz.z);
+	printf("Gyro offsets: [%d][%d][%d]\n", mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.offset.xyz.x, mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.offset.xyz.y,mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.offset.xyz.z);
 
 	return ESP_OK;
 }
 
 static esp_err_t mpu9250_cal_init(mpu9250_cal_handle_t mpu9250_cal_handle) {
-	ESP_ERROR_CHECK(mpu9250_acc_set_fsr(mpu9250_cal_handle->mpu9250_handle, mpu9250_cal_handle->mpu9250_handle->accel.fsr=INV_FSR_16G));
-	ESP_ERROR_CHECK(mpu9250_gyro_set_fsr(mpu9250_cal_handle->mpu9250_handle, mpu9250_cal_handle->mpu9250_handle->gyro.fsr=INV_FSR_2000DPS));
+	ESP_ERROR_CHECK(mpu9250_acc_set_fsr(mpu9250_cal_handle->mpu9250_handle, mpu9250_cal_handle->mpu9250_handle->data.accel.fsr=INV_FSR_16G));
+	ESP_ERROR_CHECK(mpu9250_gyro_set_fsr(mpu9250_cal_handle->mpu9250_handle, mpu9250_cal_handle->mpu9250_handle->data.gyro.fsr=INV_FSR_2000DPS));
 
 	ESP_ERROR_CHECK(mpu9250_cal_load_offset(mpu9250_cal_handle));
 
@@ -68,8 +68,8 @@ static esp_err_t mpu9250_cal_calc_means(mpu9250_cal_handle_t mpu9250_cal_handle,
 	int64_t gyro_sum[3] = {0,0,0};
 
 	for(uint8_t i = 0; i < 3; i++) {
-		mpu9250_cal_handle->mpu9250_handle->accel.cal.means[mpu9250_cal_handle->mpu9250_handle->accel.fsr].array[i] = 0;
-		mpu9250_cal_handle->mpu9250_handle->gyro.cal.means[mpu9250_cal_handle->mpu9250_handle->gyro.fsr].array[i] = 0;
+		mpu9250_cal_handle->mpu9250_handle->data.accel.cal.means[mpu9250_cal_handle->mpu9250_handle->data.accel.fsr].array[i] = 0;
+		mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.means[mpu9250_cal_handle->mpu9250_handle->data.gyro.fsr].array[i] = 0;
 	}
 
 	printf("Calculating Means with %d000 samples (wait for %d seconds)... \n", cycles, cycles);
@@ -77,13 +77,13 @@ static esp_err_t mpu9250_cal_calc_means(mpu9250_cal_handle_t mpu9250_cal_handle,
 			ulTaskNotifyTake( pdTRUE,xMaxBlockTime );
 			ESP_ERROR_CHECK(mpu9250_load_raw_data(mpu9250_cal_handle->mpu9250_handle));
 			for(uint8_t i = 0; i < 3; i++) {
-				acc_sum[i] += mpu9250_cal_handle->mpu9250_handle->raw_data.data_s_vector.accel[i];
-				gyro_sum[i] += mpu9250_cal_handle->mpu9250_handle->raw_data.data_s_vector.gyro[i];
+				acc_sum[i] += mpu9250_cal_handle->mpu9250_handle->data.raw_data.data_s_vector.accel[i];
+				gyro_sum[i] += mpu9250_cal_handle->mpu9250_handle->data.raw_data.data_s_vector.gyro[i];
 			}
 	}
 	for(uint8_t i = 0; i < 3; i++) {
-		mpu9250_cal_handle->mpu9250_handle->accel.cal.means[mpu9250_cal_handle->mpu9250_handle->accel.fsr].array[i] = acc_sum[i]/(cycles*1000);
-		mpu9250_cal_handle->mpu9250_handle->gyro.cal.means[mpu9250_cal_handle->mpu9250_handle->gyro.fsr].array[i] = gyro_sum[i]/(cycles*1000);
+		mpu9250_cal_handle->mpu9250_handle->data.accel.cal.means[mpu9250_cal_handle->mpu9250_handle->data.accel.fsr].array[i] = acc_sum[i]/(cycles*1000);
+		mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.means[mpu9250_cal_handle->mpu9250_handle->data.gyro.fsr].array[i] = gyro_sum[i]/(cycles*1000);
 	}
 	return ESP_OK;
 }
@@ -99,41 +99,41 @@ static esp_err_t mpu9250_cal_calc_var(mpu9250_cal_handle_t mpu9250_cal_handle, u
 			ulTaskNotifyTake( pdTRUE,xMaxBlockTime );
 			ESP_ERROR_CHECK(mpu9250_load_raw_data(mpu9250_cal_handle->mpu9250_handle));
 			for(uint8_t i = 0; i < 3; i++) {
-				acc_sum[i] += (mpu9250_cal_handle->mpu9250_handle->raw_data.data_s_vector.accel[i] - mpu9250_cal_handle->mpu9250_handle->accel.cal.means[mpu9250_cal_handle->mpu9250_handle->accel.fsr].array[i])*
-						      (mpu9250_cal_handle->mpu9250_handle->raw_data.data_s_vector.accel[i] - mpu9250_cal_handle->mpu9250_handle->accel.cal.means[mpu9250_cal_handle->mpu9250_handle->accel.fsr].array[i]);
-				gyro_sum[i] += (mpu9250_cal_handle->mpu9250_handle->raw_data.data_s_vector.gyro[i] - mpu9250_cal_handle->mpu9250_handle->gyro.cal.means[mpu9250_cal_handle->mpu9250_handle->gyro.fsr].array[i])*
-					 	       (mpu9250_cal_handle->mpu9250_handle->raw_data.data_s_vector.gyro[i] - mpu9250_cal_handle->mpu9250_handle->gyro.cal.means[mpu9250_cal_handle->mpu9250_handle->gyro.fsr].array[i]);
+				acc_sum[i] += (mpu9250_cal_handle->mpu9250_handle->data.raw_data.data_s_vector.accel[i] - mpu9250_cal_handle->mpu9250_handle->data.accel.cal.means[mpu9250_cal_handle->mpu9250_handle->data.accel.fsr].array[i])*
+						      (mpu9250_cal_handle->mpu9250_handle->data.raw_data.data_s_vector.accel[i] - mpu9250_cal_handle->mpu9250_handle->data.accel.cal.means[mpu9250_cal_handle->mpu9250_handle->data.accel.fsr].array[i]);
+				gyro_sum[i] += (mpu9250_cal_handle->mpu9250_handle->data.raw_data.data_s_vector.gyro[i] - mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.means[mpu9250_cal_handle->mpu9250_handle->data.gyro.fsr].array[i])*
+					 	       (mpu9250_cal_handle->mpu9250_handle->data.raw_data.data_s_vector.gyro[i] - mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.means[mpu9250_cal_handle->mpu9250_handle->data.gyro.fsr].array[i]);
 			}
 	}
 
 	for(uint8_t i = 0; i < 3; i++) {
-		mpu9250_cal_handle->mpu9250_handle->accel.cal.var[mpu9250_cal_handle->mpu9250_handle->accel.fsr].array[i] = (uint16_t)(acc_sum[i]/(cycles*1000));
-		mpu9250_cal_handle->mpu9250_handle->gyro.cal.var[mpu9250_cal_handle->mpu9250_handle->gyro.fsr].array[i] = (uint16_t)(gyro_sum[i]/(cycles*1000));
+		mpu9250_cal_handle->mpu9250_handle->data.accel.cal.var[mpu9250_cal_handle->mpu9250_handle->data.accel.fsr].array[i] = (uint16_t)(acc_sum[i]/(cycles*1000));
+		mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.var[mpu9250_cal_handle->mpu9250_handle->data.gyro.fsr].array[i] = (uint16_t)(gyro_sum[i]/(cycles*1000));
 	}
 	printf("Acc_var: [%d][%d][%d]\n",
-			mpu9250_cal_handle->mpu9250_handle->accel.cal.var[mpu9250_cal_handle->mpu9250_handle->accel.fsr].array[0],
-			mpu9250_cal_handle->mpu9250_handle->accel.cal.var[mpu9250_cal_handle->mpu9250_handle->accel.fsr].array[1],
-			mpu9250_cal_handle->mpu9250_handle->accel.cal.var[mpu9250_cal_handle->mpu9250_handle->accel.fsr].array[2]);
+			mpu9250_cal_handle->mpu9250_handle->data.accel.cal.var[mpu9250_cal_handle->mpu9250_handle->data.accel.fsr].array[0],
+			mpu9250_cal_handle->mpu9250_handle->data.accel.cal.var[mpu9250_cal_handle->mpu9250_handle->data.accel.fsr].array[1],
+			mpu9250_cal_handle->mpu9250_handle->data.accel.cal.var[mpu9250_cal_handle->mpu9250_handle->data.accel.fsr].array[2]);
 	printf("Gyro_var: [%d][%d][%d]\n",
-			mpu9250_cal_handle->mpu9250_handle->gyro.cal.var[mpu9250_cal_handle->mpu9250_handle->gyro.fsr].array[0],
-			mpu9250_cal_handle->mpu9250_handle->gyro.cal.var[mpu9250_cal_handle->mpu9250_handle->gyro.fsr].array[1],
-			mpu9250_cal_handle->mpu9250_handle->gyro.cal.var[mpu9250_cal_handle->mpu9250_handle->gyro.fsr].array[2]);
+			mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.var[mpu9250_cal_handle->mpu9250_handle->data.gyro.fsr].array[0],
+			mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.var[mpu9250_cal_handle->mpu9250_handle->data.gyro.fsr].array[1],
+			mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.var[mpu9250_cal_handle->mpu9250_handle->data.gyro.fsr].array[2]);
 	return ESP_OK;
 }
 
 static esp_err_t mpu9250_cal_calc_sqm(mpu9250_cal_handle_t mpu9250_cal_handle) {
 	for(uint8_t i = 0; i < 3; i++) {
-		mpu9250_cal_handle->mpu9250_handle->accel.cal.sqm[mpu9250_cal_handle->mpu9250_handle->accel.fsr].array[i] = sqrt(mpu9250_cal_handle->mpu9250_handle->accel.cal.var[mpu9250_cal_handle->mpu9250_handle->accel.fsr].array[i]);
-		mpu9250_cal_handle->mpu9250_handle->gyro.cal.sqm[mpu9250_cal_handle->mpu9250_handle->gyro.fsr].array[i] = sqrt(mpu9250_cal_handle->mpu9250_handle->gyro.cal.var[mpu9250_cal_handle->mpu9250_handle->gyro.fsr].array[i]);
+		mpu9250_cal_handle->mpu9250_handle->data.accel.cal.sqm[mpu9250_cal_handle->mpu9250_handle->data.accel.fsr].array[i] = sqrt(mpu9250_cal_handle->mpu9250_handle->data.accel.cal.var[mpu9250_cal_handle->mpu9250_handle->data.accel.fsr].array[i]);
+		mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.sqm[mpu9250_cal_handle->mpu9250_handle->data.gyro.fsr].array[i] = sqrt(mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.var[mpu9250_cal_handle->mpu9250_handle->data.gyro.fsr].array[i]);
 	}
 	printf("Acc_sqm: [%d][%d][%d]\n",
-			mpu9250_cal_handle->mpu9250_handle->accel.cal.sqm[mpu9250_cal_handle->mpu9250_handle->accel.fsr].array[0],
-			mpu9250_cal_handle->mpu9250_handle->accel.cal.sqm[mpu9250_cal_handle->mpu9250_handle->accel.fsr].array[1],
-			mpu9250_cal_handle->mpu9250_handle->accel.cal.sqm[mpu9250_cal_handle->mpu9250_handle->accel.fsr].array[2]);
+			mpu9250_cal_handle->mpu9250_handle->data.accel.cal.sqm[mpu9250_cal_handle->mpu9250_handle->data.accel.fsr].array[0],
+			mpu9250_cal_handle->mpu9250_handle->data.accel.cal.sqm[mpu9250_cal_handle->mpu9250_handle->data.accel.fsr].array[1],
+			mpu9250_cal_handle->mpu9250_handle->data.accel.cal.sqm[mpu9250_cal_handle->mpu9250_handle->data.accel.fsr].array[2]);
 	printf("Gyro_sqm: [%d][%d][%d]\n",
-			mpu9250_cal_handle->mpu9250_handle->gyro.cal.sqm[mpu9250_cal_handle->mpu9250_handle->gyro.fsr].array[0],
-			mpu9250_cal_handle->mpu9250_handle->gyro.cal.sqm[mpu9250_cal_handle->mpu9250_handle->gyro.fsr].array[1],
-			mpu9250_cal_handle->mpu9250_handle->gyro.cal.sqm[mpu9250_cal_handle->mpu9250_handle->gyro.fsr].array[2]);
+			mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.sqm[mpu9250_cal_handle->mpu9250_handle->data.gyro.fsr].array[0],
+			mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.sqm[mpu9250_cal_handle->mpu9250_handle->data.gyro.fsr].array[1],
+			mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.sqm[mpu9250_cal_handle->mpu9250_handle->data.gyro.fsr].array[2]);
 	return ESP_OK;
 }
 
@@ -143,10 +143,10 @@ static esp_err_t mpu9250_cal_calc_bias(mpu9250_cal_handle_t mpu9250_cal_handle) 
 	{
 		printf("Calculating Biases ... \n");
 
-		memset(mpu9250_handle->accel.cal.var[mpu9250_handle->accel.fsr].array, 0, sizeof(mpu9250_handle->accel.cal.var[mpu9250_handle->accel.fsr].array));       //Zero out var
-		memset(mpu9250_handle->accel.cal.sqm[mpu9250_handle->accel.fsr].array, 0, sizeof(mpu9250_handle->accel.cal.sqm[mpu9250_handle->accel.fsr].array));       //Zero out sqm
-		memset(mpu9250_handle->gyro.cal.var[mpu9250_handle->gyro.fsr].array, 0, sizeof(mpu9250_handle->gyro.cal.var[mpu9250_handle->gyro.fsr].array));       //Zero out var
-		memset(mpu9250_handle->gyro.cal.sqm[mpu9250_handle->gyro.fsr].array, 0, sizeof(mpu9250_handle->gyro.cal.sqm[mpu9250_handle->gyro.fsr].array));       //Zero out sqm
+		memset(mpu9250_handle->data.accel.cal.var[mpu9250_handle->data.accel.fsr].array, 0, sizeof(mpu9250_handle->data.accel.cal.var[mpu9250_handle->data.accel.fsr].array));       //Zero out var
+		memset(mpu9250_handle->data.accel.cal.sqm[mpu9250_handle->data.accel.fsr].array, 0, sizeof(mpu9250_handle->data.accel.cal.sqm[mpu9250_handle->data.accel.fsr].array));       //Zero out sqm
+		memset(mpu9250_handle->data.gyro.cal.var[mpu9250_handle->data.gyro.fsr].array, 0, sizeof(mpu9250_handle->data.gyro.cal.var[mpu9250_handle->data.gyro.fsr].array));       //Zero out var
+		memset(mpu9250_handle->data.gyro.cal.sqm[mpu9250_handle->data.gyro.fsr].array, 0, sizeof(mpu9250_handle->data.gyro.cal.sqm[mpu9250_handle->data.gyro.fsr].array));       //Zero out sqm
 
 		ESP_ERROR_CHECK(mpu9250_cal_calc_var(mpu9250_cal_handle, MPU9250_CAL_MAX_KSAMPLE_CYCLES));
 		ESP_ERROR_CHECK(mpu9250_cal_calc_sqm(mpu9250_cal_handle));
@@ -210,8 +210,8 @@ static esp_err_t mpu9250_cal_calc_offset(mpu9250_cal_handle_t mpu9250_cal_handle
 		ESP_ERROR_CHECK(mpu9250_cal_calc_means(mpu9250_cal_handle, MPU9250_CAL_MAX_KSAMPLE_CYCLES));
 
 		for(uint8_t i = 0; i<3; i++) {
-			ESP_ERROR_CHECK(mpu9250_cal_set_found_offset(&mpu9250_cal_handle->found[MPU9250_CAL_ACCEL_INDEX][i], 1, (i==Z_POS ? mpu9250_cal_handle->mpu9250_handle->accel.lsb : 0 ), mpu9250_cal_handle->mpu9250_handle->accel.cal.means[mpu9250_cal_handle->mpu9250_handle->accel.fsr].array[i], &mpu9250_cal_handle->mpu9250_handle->accel.cal.offset.array[i]));
-			ESP_ERROR_CHECK(mpu9250_cal_set_found_offset(&mpu9250_cal_handle->found[MPU9250_CAL_GYRO_INDEX][i], 0, 0, mpu9250_cal_handle->mpu9250_handle->gyro.cal.means[mpu9250_cal_handle->mpu9250_handle->gyro.fsr].array[i], &mpu9250_cal_handle->mpu9250_handle->gyro.cal.offset.array[i]));
+			ESP_ERROR_CHECK(mpu9250_cal_set_found_offset(&mpu9250_cal_handle->found[MPU9250_CAL_ACCEL_INDEX][i], 1, (i==Z_POS ? mpu9250_cal_handle->mpu9250_handle->data.accel.lsb : 0 ), mpu9250_cal_handle->mpu9250_handle->data.accel.cal.means[mpu9250_cal_handle->mpu9250_handle->data.accel.fsr].array[i], &mpu9250_cal_handle->mpu9250_handle->data.accel.cal.offset.array[i]));
+			ESP_ERROR_CHECK(mpu9250_cal_set_found_offset(&mpu9250_cal_handle->found[MPU9250_CAL_GYRO_INDEX][i], 0, 0, mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.means[mpu9250_cal_handle->mpu9250_handle->data.gyro.fsr].array[i], &mpu9250_cal_handle->mpu9250_handle->data.gyro.cal.offset.array[i]));
 		}
 
 		uint8_t found_all = 0;
@@ -220,8 +220,8 @@ static esp_err_t mpu9250_cal_calc_offset(mpu9250_cal_handle_t mpu9250_cal_handle
 				found_all += mpu9250_cal_handle->found[i][j];
 			}
 		}
-		ESP_ERROR_CHECK(mpu9250_acc_set_offset(mpu9250_handle, mpu9250_handle->accel.cal.offset.xyz.x, mpu9250_handle->accel.cal.offset.xyz.y, mpu9250_handle->accel.cal.offset.xyz.z));
-		ESP_ERROR_CHECK(mpu9250_gyro_set_offset(mpu9250_handle, mpu9250_handle->gyro.cal.offset.xyz.x, mpu9250_handle->gyro.cal.offset.xyz.y, mpu9250_handle->gyro.cal.offset.xyz.z));
+		ESP_ERROR_CHECK(mpu9250_acc_set_offset(mpu9250_handle, mpu9250_handle->data.accel.cal.offset.xyz.x, mpu9250_handle->data.accel.cal.offset.xyz.y, mpu9250_handle->data.accel.cal.offset.xyz.z));
+		ESP_ERROR_CHECK(mpu9250_gyro_set_offset(mpu9250_handle, mpu9250_handle->data.gyro.cal.offset.xyz.x, mpu9250_handle->data.gyro.cal.offset.xyz.y, mpu9250_handle->data.gyro.cal.offset.xyz.z));
 
 		ESP_ERROR_CHECK(mpu9250_cal_discard_messages(mpu9250_handle, 10000));
 		ESP_ERROR_CHECK(mpu9250_cal_display_messages(mpu9250_handle, 1000));
