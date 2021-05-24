@@ -82,35 +82,80 @@ static esp_err_t mpu9250_acc_save_offset(mpu9250_handle_t mpu9250_handle) {
 	return ret;
 }
 
+/*
+Final Acc offsets: [6786][-5534][9809]
+Final Gyro offsets: [350][-32][-18]
+MPU9250: AccFSR 16g
+MPU9250: GyroFSR 2000dps
+Discarding 10000 Samples ...
+Calculating Biases ...
+Calculating Var with 10000 samples (wait for 10 seconds)...
+Acc_var: [2][1][2]
+Gyro_var: [0][0][0]
+Acc_sqm: [1][1][1]
+Gyro_sqm: [0][0][0]
+MPU9250: AccFSR 8g
+MPU9250: GyroFSR 1000dps
+Discarding 10000 Samples ...
+Calculating Means with 10000 samples (wait for 10 seconds)...
+Calculating Biases ...
+Calculating Var with 10000 samples (wait for 10 seconds)...
+Acc_var: [5][7][6]
+Gyro_var: [0][0][0]
+Acc_sqm: [2][2][2]
+Gyro_sqm: [0][0][0]
+MPU9250: AccFSR 4g
+MPU9250: GyroFSR 500dps
+Discarding 10000 Samples ...
+Calculating Means with 10000 samples (wait for 10 seconds)...
+Calculating Biases ...
+Calculating Var with 10000 samples (wait for 10 seconds)...
+Acc_var: [34][56][23]
+Gyro_var: [3][2][2]
+Acc_sqm: [5][7][4]
+Gyro_sqm: [1][1][1]
+MPU9250: AccFSR 2g
+MPU9250: GyroFSR 250dps
+Discarding 10000 Samples ...
+Calculating Means with 10000 samples (wait for 10 seconds)...
+Calculating Biases ...
+Calculating Var with 10000 samples (wait for 10 seconds)...
+Acc_var: [81][69][111]
+Gyro_var: [8][10][6]
+Acc_sqm: [9][8][10]
+Gyro_sqm: [2][3][2]
+
+ *
+ */
 static esp_err_t mpu9250_acc_load_statistics(mpu9250_handle_t mpu9250_handle) {
-	mpu9250_handle->data.accel.cal.offset.array[X_POS]=6995;
-	mpu9250_handle->data.accel.cal.offset.array[Y_POS]=-5411;
-	mpu9250_handle->data.accel.cal.offset.array[Z_POS]=9684;
+	mpu9250_handle->data.accel.cal.offset.array[X_POS]=6786;
+	mpu9250_handle->data.accel.cal.offset.array[Y_POS]=-5534;
+	mpu9250_handle->data.accel.cal.offset.array[Z_POS]=9809;
 
-	mpu9250_handle->data.accel.cal.var[INV_FSR_2G].array[X_POS]=197;
-	mpu9250_handle->data.accel.cal.var[INV_FSR_2G].array[Y_POS]=209;
-	mpu9250_handle->data.accel.cal.var[INV_FSR_2G].array[Z_POS]=247;
-	mpu9250_handle->data.accel.cal.sqm[INV_FSR_2G].array[X_POS]=14;
-	mpu9250_handle->data.accel.cal.sqm[INV_FSR_2G].array[Y_POS]=14;
-	mpu9250_handle->data.accel.cal.sqm[INV_FSR_2G].array[Z_POS]=15;
+	mpu9250_handle->data.accel.cal.var[INV_FSR_2G].array[X_POS]=81;
+	mpu9250_handle->data.accel.cal.var[INV_FSR_2G].array[Y_POS]=69;
+	mpu9250_handle->data.accel.cal.var[INV_FSR_2G].array[Z_POS]=111;
+	mpu9250_handle->data.accel.cal.sqm[INV_FSR_2G].array[X_POS]=9;
+	mpu9250_handle->data.accel.cal.sqm[INV_FSR_2G].array[Y_POS]=8;
+	mpu9250_handle->data.accel.cal.sqm[INV_FSR_2G].array[Z_POS]=10;
 
-	mpu9250_handle->data.accel.cal.var[INV_FSR_4G].array[X_POS]=50;
-	mpu9250_handle->data.accel.cal.var[INV_FSR_4G].array[Y_POS]=50;
-	mpu9250_handle->data.accel.cal.var[INV_FSR_4G].array[Z_POS]=59;
-	mpu9250_handle->data.accel.cal.sqm[INV_FSR_4G].array[X_POS]=7;
+	mpu9250_handle->data.accel.cal.var[INV_FSR_4G].array[X_POS]=34;
+	mpu9250_handle->data.accel.cal.var[INV_FSR_4G].array[Y_POS]=56;
+	mpu9250_handle->data.accel.cal.var[INV_FSR_4G].array[Z_POS]=23;
+	mpu9250_handle->data.accel.cal.sqm[INV_FSR_4G].array[X_POS]=5;
 	mpu9250_handle->data.accel.cal.sqm[INV_FSR_4G].array[Y_POS]=7;
-	mpu9250_handle->data.accel.cal.sqm[INV_FSR_4G].array[Z_POS]=7;
+	mpu9250_handle->data.accel.cal.sqm[INV_FSR_4G].array[Z_POS]=4;
 
-	mpu9250_handle->data.accel.cal.var[INV_FSR_8G].array[X_POS]=12;
-	mpu9250_handle->data.accel.cal.var[INV_FSR_8G].array[Y_POS]=12;
-	mpu9250_handle->data.accel.cal.var[INV_FSR_8G].array[Z_POS]=13;
-	mpu9250_handle->data.accel.cal.sqm[INV_FSR_8G].array[X_POS]=3;
-	mpu9250_handle->data.accel.cal.sqm[INV_FSR_8G].array[Y_POS]=3;
-	mpu9250_handle->data.accel.cal.sqm[INV_FSR_8G].array[Z_POS]=3;
+	mpu9250_handle->data.accel.cal.var[INV_FSR_8G].array[X_POS]=5;
+	mpu9250_handle->data.accel.cal.var[INV_FSR_8G].array[Y_POS]=7;
+	mpu9250_handle->data.accel.cal.var[INV_FSR_8G].array[Z_POS]=6;
+	mpu9250_handle->data.accel.cal.sqm[INV_FSR_8G].array[X_POS]=2;
+	mpu9250_handle->data.accel.cal.sqm[INV_FSR_8G].array[Y_POS]=2;
+	mpu9250_handle->data.accel.cal.sqm[INV_FSR_8G].array[Z_POS]=2;
 
-	mpu9250_handle->data.accel.cal.var[INV_FSR_16G].array[X_POS]=3;
-	mpu9250_handle->data.accel.cal.var[INV_FSR_16G].array[Y_POS]=2;
-	mpu9250_handle->data.accel.cal.var[INV_FSR_16G].array[Z_POS]=3;
+	mpu9250_handle->data.accel.cal.var[INV_FSR_16G].array[X_POS]=2;
+	mpu9250_handle->data.accel.cal.var[INV_FSR_16G].array[Y_POS]=1;
+	mpu9250_handle->data.accel.cal.var[INV_FSR_16G].array[Z_POS]=2;
 	mpu9250_handle->data.accel.cal.sqm[INV_FSR_16G].array[X_POS]=1;
 	mpu9250_handle->data.accel.cal.sqm[INV_FSR_16G].array[Y_POS]=1;
 	mpu9250_handle->data.accel.cal.sqm[INV_FSR_16G].array[Z_POS]=1;

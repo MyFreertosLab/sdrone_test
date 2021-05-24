@@ -51,6 +51,9 @@ void mpu9250_cb_means(mpu9250_cb_handle_t cb, int16_t* mean) {
 	}
 	*mean = sum/CIRCULAR_BUFFER_SIZE;
 }
+void mpu9250_cb_last(mpu9250_cb_handle_t cb, int16_t* val) {
+	*val = cb->data[cb->cursor];
+}
 
 
 /************************************************************************
@@ -182,8 +185,8 @@ esp_err_t mpu9250_calc_gravity(mpu9250_handle_t mpu9250_handle) {
 esp_err_t mpu9250_calc_rpy(mpu9250_handle_t mpu9250_handle) {
 
 	// roll pitch fusion (accel + gyro)
-	mpu9250_handle->data.gyro.rpy.xyz.x += 0.003*(mpu9250_handle->data.accel.rpy.xyz.x - mpu9250_handle->data.gyro.rpy.xyz.x);
-	mpu9250_handle->data.gyro.rpy.xyz.y += 0.003*(mpu9250_handle->data.accel.rpy.xyz.y - mpu9250_handle->data.gyro.rpy.xyz.y);
+	mpu9250_handle->data.gyro.rpy.xyz.x += 0.0025*(mpu9250_handle->data.accel.rpy.xyz.x - mpu9250_handle->data.gyro.rpy.xyz.x);
+	mpu9250_handle->data.gyro.rpy.xyz.y += 0.0025*(mpu9250_handle->data.accel.rpy.xyz.y - mpu9250_handle->data.gyro.rpy.xyz.y);
 
 	return ESP_OK;
 }
