@@ -11,6 +11,12 @@
 #include <rc.h>
 
 typedef struct {
+	uint16_t min;
+	uint16_t center;
+	uint16_t max;
+} sdrone_rc_channels_range_t;
+
+typedef struct {
 	uint32_t driver_id;
 	uint32_t controller_driver_id;
 	rc_t rc_data;

@@ -14,6 +14,7 @@ static 	RingbufHandle_t rb = NULL;
 /************************************************************************
  ****************** A P I  I M P L E M E N T A T I O N ******************
  ************************************************************************/
+rmt_config_t rmt_rx;
 esp_err_t rc_init(rc_handle_t rc_handle) {
 	printf("PPM RX initialization started ... \n");
 	memset(rc_handle, 0, sizeof(*rc_handle));
@@ -33,7 +34,6 @@ esp_err_t rc_init(rc_handle_t rc_handle) {
 	gpio_set_direction(rc_handle->config.gpio_num, GPIO_MODE_INPUT);
 
 	printf("Configuring RMT module ... \n");
-	rmt_config_t rmt_rx;
 	rmt_rx.channel = rc_handle->config.channel;
 	rmt_rx.gpio_num = rc_handle->config.gpio_num;
 	rmt_rx.clk_div = rc_handle->config.clock_div;
