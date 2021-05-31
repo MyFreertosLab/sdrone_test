@@ -12,6 +12,8 @@
 #include <sdrone_rc_task.h>
 #include <sdrone_imu_task.h>
 
+#define SDRONE_NORM_THROTTLE_TO_NEWTON_FACTOR ((float)MOTORS_MAX_NEWTON/(float)SDRONE_RC_CHANNEL_RANGE)
+
 typedef enum {
 	SDRONE_MOTORS_DRIVER_ID = 1,
 	SDRONE_RC_DRIVER_ID,

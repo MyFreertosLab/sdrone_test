@@ -174,7 +174,7 @@ static esp_err_t mpu9250_gyro_calc_rpy(mpu9250_handle_t mpu9250_handle) {
 	// angolo di rotazione: w(i)=domega(i)*dt espresso in rad
 	double w[3] = {0.0f,0.0f,0.0f};
 	for(uint8_t i = 0; i < 3; i++) {
-		w[i] = (double)(mpu9250_handle->data.gyro.cal.kalman[i].X)/(double)mpu9250_handle->data.gyro.lsb/(double)500.0f/(double)360.0f*(double)PI_2;
+		w[i] = (double)(mpu9250_handle->data.gyro.cal.kalman[i].X)/(double)mpu9250_handle->data.gyro.lsb/(double)mpu9250_handle->data_rate/(double)360.0f*(double)PI_2;
 	}
 
 	mpu9250_handle->data.gyro.rpy.xyz.x += w[X_POS];

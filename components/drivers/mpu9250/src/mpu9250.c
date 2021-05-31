@@ -89,6 +89,7 @@ esp_err_t mpu9250_init(mpu9250_handle_t mpu9250_handle) {
     // set Clock Divider
 	printf("MPU9250: Data rate 500Hz\n");
     ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_SMPLRT_DIV, 0x01));
+    mpu9250_handle->data_rate = 500;
 
 //    // set Master Control
 //    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_USER_CTRL, 0x20));

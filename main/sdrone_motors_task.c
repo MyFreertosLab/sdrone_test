@@ -51,7 +51,6 @@ void sdrone_motors_controller_cycle(
 		// Take Notify at end of duty_cycle
 		if (ulTaskNotifyTake( pdTRUE, pdMS_TO_TICKS(10))
 				== sdrone_motors_state_handle->controller_driver_id) {
-            printf("motors received notify\n");
 			if (sdrone_motors_state_handle->input.isCommand) {
 				switch (sdrone_motors_state_handle->input.command.type) {
 				case MOTORS_ARM: {
@@ -81,6 +80,11 @@ void sdrone_motors_controller_cycle(
 				/*
 				 * load input data to local var
 				 */
+				float nd = 0;
+				ESP_ERROR_CHECK(motors_newton_to_duty(sdrone_motors_state_handle->input.data.thrust, &motors_handle->motor[1].duty_cycle));
+				ESP_ERROR_CHECK(motors_duty_to_newton(motors_handle->motor[1].duty_cycle, &nd));
+				printf("MOTOR 1: N[%5.5f],D[%5.5f], ND[%5.5f]\n", sdrone_motors_state_handle->input.data.thrust, motors_handle->motor[1].duty_cycle, nd);
+				ESP_ERROR_CHECK(motors_update(motors_handle));
 				sdrone_motors_state_handle->input.data.tx_rx_flag =
 						MOTORS_TXRX_RECEIVED;
 			}

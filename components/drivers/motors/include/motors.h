@@ -23,6 +23,13 @@
 
 //#define MOTORS_FRAME_HORIZONTAL_HEXACOPTER
 #define MOTORS_FRAME_TWO_HORIZONTAL_AXIS
+#define MOTORS_DUTY_MAX_ZERO  52
+#define MOTORS_DUTY_MAX_LOW   66
+#define MOTORS_DUTY_MAX      100
+#define MOTORS_DUTY_TO_NEWTON_FACTOR_LOW 0.0602f
+#define MOTORS_DUTY_TO_NEWTON_FACTOR_HIGH 0.105f
+#define MOTORS_MAX_NEWTON 4.4f
+#define MOTORS_DUTY_DEAD_RANGE 60.0f
 
 // TODO: Define all positions from quad to opto
 typedef enum {
@@ -75,5 +82,7 @@ esp_err_t motors_disarm(motors_handle_t motors_handle);
 esp_err_t motors_switchoff(motors_handle_t motors_handle);
 esp_err_t motors_switchon(motors_handle_t motors_handle);
 esp_err_t motors_update(motors_handle_t motors_handle);
+esp_err_t motors_newton_to_duty(float newton, float* duty);
+esp_err_t motors_duty_to_newton(float duty, float* newton);
 
 #endif /* COMPONENTS_MOTORS_INCLUDE_MOTORS_H_ */

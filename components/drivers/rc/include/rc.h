@@ -9,6 +9,7 @@
 #define COMPONENTS_RC_INCLUDE_RC_H_
 #include <stdint.h>
 #include <esp_err.h>
+#include <driver/rmt.h>
 
 #define RC_CHANNEL            0                  /* Channel input (0-7) for receiver */
 #define RC_GPIO_NUM           23                 /* GPIO number for receiver */
@@ -19,6 +20,15 @@
 #define RC_TICK_TRASH         100                /* Interference */
 #define RC_MAX_CHANNELS       8
 
+#define RC_THROTTLE 1
+#define RC_ROLL     0
+#define RC_PITCH    2
+#define RC_YAW      3
+#define RC_AUX1     5
+#define RC_AUX2     4
+#define RC_AUX3     6
+#define RC_AUX4     7
+
 typedef enum {
         RC_TXRX_IGNORE = 0,
         RC_TXRX_TRANSMITTED = 1,
@@ -26,20 +36,20 @@ typedef enum {
 } rc_txrx_signal_t;
 
 typedef struct {
-    uint8_t channel;
-    uint8_t gpio_num;
-    uint8_t clock_div;
-    uint8_t mem_block_num;
-    uint8_t ticks_thresh;
-    uint16_t idle_threshold;
-} rc_config_t;
-typedef rc_config_t* rc_config_handle_t;
+	uint16_t min;
+	uint16_t max;
+	uint16_t center;
+	uint16_t value;
+} rc_stick_range_t;
+
 typedef struct {
-	uint32_t channels[RC_MAX_CHANNELS];
+	uint16_t raw[RC_MAX_CHANNELS];
+	int16_t norm[RC_MAX_CHANNELS];
 	volatile rc_txrx_signal_t txrx_signal;
 } rc_data_t;
 typedef struct {
-	rc_config_t config;
+	rmt_config_t config;
+	rc_stick_range_t rc_channels_range[RC_MAX_CHANNELS];
 	rc_data_t data;
 } rc_t;
 typedef rc_t* rc_handle_t;

@@ -72,10 +72,8 @@ esp_err_t motors_high_duty_motors(motors_handle_t motors_handle) {
 }
 
 esp_err_t motors_update_motors(motors_handle_t motors_handle) {
-	printf("motors: motors_update_motors\n");
 	for (uint8_t i = 0; i < MOTORS_MAX_NUM; i++) {
 	  if (motors_handle->motor[i].enabled) {
-	    printf("motors: motors_update_motors[%d/%2.2f]\n", i, motors_handle->motor[i].duty_cycle);
 		ESP_ERROR_CHECK(mcpwm_set_duty(motors_handle->motor[i].mcpwm, motors_timers[i],motors_pwm_generator[i],motors_handle->motor[i].duty_cycle));
       }
 	}
@@ -221,6 +219,7 @@ esp_err_t motors_config_two_horizontal_axis(motors_handle_t motors_handle) {
 
 	return ESP_OK;
 }
+
 esp_err_t motors_config_switchonoff_pin(motors_handle_t motors_handle) {
 	printf("motors_config_switchonoff_pin::Started\n");
     // Gpio Switch On/Off pin
@@ -238,6 +237,28 @@ esp_err_t motors_config_switchonoff_pin(motors_handle_t motors_handle) {
 /************************************************************************
  ****************** A P I  I M P L E M E N T A T I O N ******************
  ************************************************************************/
+esp_err_t motors_newton_to_duty(float newton, float* duty) {
+	if(newton <= (MOTORS_DUTY_DEAD_RANGE - MOTORS_DUTY_MAX_ZERO)*MOTORS_DUTY_TO_NEWTON_FACTOR_LOW) {
+		*duty = MOTORS_DUTY_MAX_ZERO;
+	} else if(newton <= (MOTORS_DUTY_MAX_LOW - MOTORS_DUTY_MAX_ZERO)*MOTORS_DUTY_TO_NEWTON_FACTOR_LOW) {
+		*duty = MOTORS_DUTY_MAX_ZERO + newton/MOTORS_DUTY_TO_NEWTON_FACTOR_LOW;
+	} else {
+		*duty = MOTORS_DUTY_MAX_LOW + (newton - (MOTORS_DUTY_MAX_LOW - MOTORS_DUTY_MAX_ZERO)*MOTORS_DUTY_TO_NEWTON_FACTOR_LOW)/MOTORS_DUTY_TO_NEWTON_FACTOR_HIGH;
+	}
+	return ESP_OK;
+}
+
+esp_err_t motors_duty_to_newton(float duty, float* newton) {
+	if(duty <= MOTORS_DUTY_DEAD_RANGE) {
+		*newton = 0.0f;
+	} else if(duty < MOTORS_DUTY_MAX_LOW) {
+		*newton = (duty - MOTORS_DUTY_MAX_ZERO)*MOTORS_DUTY_TO_NEWTON_FACTOR_LOW;
+	} else {
+		*newton = (MOTORS_DUTY_MAX_LOW-MOTORS_DUTY_MAX_ZERO)*MOTORS_DUTY_TO_NEWTON_FACTOR_LOW + (duty - MOTORS_DUTY_MAX_LOW)*MOTORS_DUTY_TO_NEWTON_FACTOR_HIGH;
+	}
+	return ESP_OK;
+}
+
 esp_err_t motors_init(motors_handle_t motors_handle) {
 	printf("motors: motors_init\n");
 	memset(motors_handle, 0, sizeof(*motors_handle));
@@ -257,7 +278,7 @@ esp_err_t motors_init(motors_handle_t motors_handle) {
 	ESP_ERROR_CHECK(motors_init_mcpwm(motors_handle, MCPWM_UNIT_0));
 	ESP_ERROR_CHECK(motors_init_mcpwm(motors_handle, MCPWM_UNIT_1));
     vTaskDelay(500); //delay of 5s (at 100Hz)
-    ESP_ERROR_CHECK(motors_high_duty_motors(motors_handle));
+    //ESP_ERROR_CHECK(motors_high_duty_motors(motors_handle));
 	ESP_ERROR_CHECK(motors_switchon(motors_handle));
     vTaskDelay(200); //delay of 2s (at 100Hz)
     ESP_ERROR_CHECK(motors_low_duty_motors(motors_handle));

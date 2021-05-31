@@ -505,6 +505,7 @@ typedef struct mpu9250_init_s {
     // MPU9250 id
     uint8_t whoami;
     mpu9250_data_t data;
+    uint16_t data_rate;
 } mpu9250_init_t;
 
 typedef mpu9250_init_t* mpu9250_handle_t;
