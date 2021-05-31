@@ -244,8 +244,8 @@ enum ak8963_register {
 	AK8963_HZL = 0x7,
 	AK8963_HZH = 0x8,
 	AK8963_ST2 = 0x9,
-	AK8963_CNTL = 0xA,
-	AK8963_RSV = 0xB,
+	AK8963_CNTL1 = 0xA,
+	AK8963_CNTL2 = 0xB,
 	AK8963_ASTC = 0xC,
 	AK8963_TS1 = 0xD,
 	AK8963_TS2 = 0xE,
@@ -253,11 +253,13 @@ enum ak8963_register {
 	AK8963_ASAX = 0x10,
 	AK8963_ASAY = 0x11,
 	AK8963_ASAZ = 0x12,
+	AK8963_RSV = 0x13
 };
 
 #define MAG_CTRL_OP_MODE_MASK 0xF
 #define AK8963_ST1_DRDY_BIT 0
 #define AK8963_WHO_AM_I_RESULT 0x48
+#define AK8963_ADDRESS 0x0C
 
 /*********************************
 ********* Low Pass Filter ********

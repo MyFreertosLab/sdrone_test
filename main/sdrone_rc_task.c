@@ -76,20 +76,14 @@ void sdrone_rc_task(void *arg) {
 	float scale_factor_right[RC_MAX_CHANNELS];
 	int16_t value[RC_MAX_CHANNELS];
 
-/*
-channel [0]; scale: [0.97656][1.01010]
-channel [1]; scale: [1.00806][0.97087]
-channel [2]; scale: [1.08696][0.94340]
-channel [3]; scale: [1.04167][0.94877]
-channel [4]; scale: [1.00000][0.99404]
-channel [5]; scale: [1.00000][0.99602]
-channel [6]; scale: [1.00000][0.99602]
-channel [7]; scale: [1.00000][0.99602]
-
- */
 	for(uint8_t i = 0; i < RC_MAX_CHANNELS; i++) {
-		scale_factor_left[i] = 200.0/(rc_channels_range[i].center - rc_channels_range[i].min);
-		scale_factor_right[i] = 200.0/(rc_channels_range[i].max - rc_channels_range[i].center);
+		if((rc_channels_range[i].center - rc_channels_range[i].min) != 0) {
+			scale_factor_left[i] = ((float)SDRONE_RC_CHANNEL_RANGE)/(rc_channels_range[i].center - rc_channels_range[i].min);
+			scale_factor_right[i] = ((float)SDRONE_RC_CHANNEL_RANGE)/(rc_channels_range[i].max - rc_channels_range[i].center);
+		} else {
+			scale_factor_left[i] = 0.0;
+			scale_factor_right[i] = 0.0;
+		}
 		printf("channel [%d]; scale: [%2.5f][%2.5f]\n", i, scale_factor_left[i], scale_factor_right[i]);
 	}
 
@@ -105,16 +99,16 @@ channel [7]; scale: [1.00000][0.99602]
 
 				// TODO: inviare anche i valori normalizzati oltre che quelli raw
 				// TODO: i dati raw possono essere uint16_t. Modificare rc_t
-				for(uint8_t i = 0; i < RC_MAX_CHANNELS; i++) {
-					if(rc_data_local_handle->data.channels[i] < rc_channels_range[i].center) {
-						value[i] = (int16_t)((rc_channels_range[i].center - rc_data_local_handle->data.channels[i])*scale_factor_left[i]);
-						value[i] = -value[i];
-					} else {
-						value[i] = (int16_t)((rc_data_local_handle->data.channels[i] - rc_channels_range[i].center)*scale_factor_right[i]);
-					}
-					printf("[%d]-v[%d] ", i, value[i]);
-				}
-				printf("\n");
+//				for(uint8_t i = 0; i < RC_MAX_CHANNELS; i++) {
+//					if(rc_data_local_handle->data.channels[i] < rc_channels_range[i].center) {
+//						value[i] = (int16_t)((rc_channels_range[i].center - rc_data_local_handle->data.channels[i])*scale_factor_left[i]);
+//						value[i] = -value[i];
+//					} else {
+//						value[i] = (int16_t)((rc_data_local_handle->data.channels[i] - rc_channels_range[i].center)*scale_factor_right[i]);
+//					}
+//					printf("[%d]-v[%d] ", i, value[i]);
+//				}
+//				printf("\n");
 			}
 		}
 	}

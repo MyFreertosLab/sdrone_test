@@ -72,8 +72,8 @@ esp_err_t mpu9250_init(mpu9250_handle_t mpu9250_handle) {
     // set Configuration Register
 //	printf("MPU9250: Gyro bandwidth 184Hz\n");
 //    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_CONFIG, 0x01)); // gyro bandwidth 184Hz
-	printf("MPU9250: Gyro bandwidth 5Hz\n");
-    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_CONFIG, 0x06)); // gyro bandwidth 5Hz
+	printf("MPU9250: Gyro bandwidth 184Hz\n");
+    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_CONFIG, 0x01));
 
     // set Gyro Configuration Register
 	printf("MPU9250: Gyro +-250deg/sec\n");
@@ -83,9 +83,43 @@ esp_err_t mpu9250_init(mpu9250_handle_t mpu9250_handle) {
 	ESP_ERROR_CHECK(mpu9250_acc_set_fsr(mpu9250_handle, INV_FSR_16G));
 
     // set Acc Conf2 Register
-	printf("MPU9250: Accel bandwidth 5Hz\n");
-    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_ACCEL_CONFIG_2, 0x06)); // bandwidth 5Hz
+	printf("MPU9250: Accel bandwidth 460Hz\n");
+    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_ACCEL_CONFIG_2, 0x00));
 
+    // set Clock Divider
+	printf("MPU9250: Data rate 500Hz\n");
+    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_SMPLRT_DIV, 0x01));
+
+//    // set Master Control
+//    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_USER_CTRL, 0x20));
+//
+//    // I2C 400KHz
+//    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_I2C_MST_CTRL, 0x0D));
+//
+//    // Reset AK8963 I2C Slave
+//    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_I2C_SLV0_ADDR, AK8963_ADDRESS));
+//    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_I2C_SLV0_REG, AK8963_CNTL2)); // register where begin data transfer
+//    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_I2C_SLV0_DO, 0x01)); // reset ak8963
+//    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_I2C_SLV0_CTRL, 0x81)); // send data
+//    vTaskDelay(pdMS_TO_TICKS(10));
+//
+//    // Configure AK8963 Continuous Mode
+//    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_I2C_SLV0_ADDR, AK8963_ADDRESS));
+//    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_I2C_SLV0_REG, AK8963_CNTL1)); // register where begin data transfer
+//    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_I2C_SLV0_DO, 0x12)); // value 16 bit continuous mode 1
+//    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_I2C_SLV0_CTRL, 0x81));// send data
+//    vTaskDelay(pdMS_TO_TICKS(5));
+//
+//    // Read Who Am I
+//    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_I2C_SLV0_ADDR, AK8963_ADDRESS|0x80));
+//    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_I2C_SLV0_REG, AK8963_INFO)); // register where begin data transfer
+//    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_I2C_SLV0_DO, 0x12)); // value 16 bit continuous mode 1
+//    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_I2C_SLV0_CTRL, 0x81));// send data
+//    vTaskDelay(pdMS_TO_TICKS(5));
+//
+//	printf("MPU9250: I2C BYPASS_EN\n");
+//    ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_INT_PIN_CFG, 0x02));
+//
     // set PwrMgmt2 Register
     ESP_ERROR_CHECK(mpu9250_write8(mpu9250_handle, MPU9250_PWR_MGMT_2, 0x00));
 
@@ -154,6 +188,7 @@ esp_err_t mpu9250_test_connection(mpu9250_handle_t mpu9250_handle) {
 
 esp_err_t mpu9250_load_raw_data(mpu9250_handle_t mpu9250_handle) {
 	uint8_t buff[26];
+
 	esp_err_t ret = mpu9250_read_buff(mpu9250_handle, MPU9250_ACCEL_XOUT_H, buff, 26*8);
 	mpu9250_handle->data.raw_data.data_s_xyz.accel_data_x = ((buff[0] << 8) | buff[1]);
 	mpu9250_handle->data.raw_data.data_s_xyz.accel_data_y = ((buff[2] << 8) | buff[3]);
@@ -169,6 +204,7 @@ esp_err_t mpu9250_load_raw_data(mpu9250_handle_t mpu9250_handle) {
 	}
 	return ret;
 }
+
 esp_err_t mpu9250_calc_gravity(mpu9250_handle_t mpu9250_handle) {
 	double cx=cos(mpu9250_handle->data.gyro.rpy.xyz.x);
 	double cy=cos(mpu9250_handle->data.gyro.rpy.xyz.y);

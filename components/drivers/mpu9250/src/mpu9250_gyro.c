@@ -11,10 +11,70 @@
 #include <mpu9250_spi.h>
 #include <mpu9250_gyro.h>
 #include <math.h>
+#include "esp_system.h"
+#include <nvs_flash.h>
+#include <nvs.h>
 
 /************************************************************************
  ************** P R I V A T E  I M P L E M E N T A T I O N **************
  ************************************************************************/
+static esp_err_t mpu9250_gyro_load_calibration_data(mpu9250_handle_t mpu9250_handle) {
+    nvs_handle_t my_handle;
+    uint8_t flashed = 0;
+    ESP_ERROR_CHECK(nvs_open("GYRO_CAL", NVS_READWRITE, &my_handle));
+    ESP_ERROR_CHECK(nvs_get_u8(my_handle, "FLASHED", &flashed));
+
+    ESP_ERROR_CHECK(nvs_get_i16(my_handle, "X_OFF", &mpu9250_handle->data.gyro.cal.offset.array[X_POS]));
+    ESP_ERROR_CHECK(nvs_get_i16(my_handle, "Y_OFF", &mpu9250_handle->data.gyro.cal.offset.array[Y_POS]));
+    ESP_ERROR_CHECK(nvs_get_i16(my_handle, "Z_OFF", &mpu9250_handle->data.gyro.cal.offset.array[Z_POS]));
+
+    ESP_ERROR_CHECK(nvs_get_u16(my_handle, "X_VAR_250", &mpu9250_handle->data.gyro.cal.var[INV_FSR_250DPS].array[X_POS]));
+    ESP_ERROR_CHECK(nvs_get_u16(my_handle, "Y_VAR_250", &mpu9250_handle->data.gyro.cal.var[INV_FSR_250DPS].array[Y_POS]));
+    ESP_ERROR_CHECK(nvs_get_u16(my_handle, "Z_VAR_250", &mpu9250_handle->data.gyro.cal.var[INV_FSR_250DPS].array[Z_POS]));
+
+    ESP_ERROR_CHECK(nvs_get_u16(my_handle, "X_VAR_500", &mpu9250_handle->data.gyro.cal.var[INV_FSR_500DPS].array[X_POS]));
+    ESP_ERROR_CHECK(nvs_get_u16(my_handle, "Y_VAR_500", &mpu9250_handle->data.gyro.cal.var[INV_FSR_500DPS].array[Y_POS]));
+    ESP_ERROR_CHECK(nvs_get_u16(my_handle, "Z_VAR_500", &mpu9250_handle->data.gyro.cal.var[INV_FSR_500DPS].array[Z_POS]));
+
+    ESP_ERROR_CHECK(nvs_get_u16(my_handle, "X_VAR_1000", &mpu9250_handle->data.gyro.cal.var[INV_FSR_1000DPS].array[X_POS]));
+    ESP_ERROR_CHECK(nvs_get_u16(my_handle, "Y_VAR_1000", &mpu9250_handle->data.gyro.cal.var[INV_FSR_1000DPS].array[Y_POS]));
+    ESP_ERROR_CHECK(nvs_get_u16(my_handle, "Z_VAR_1000", &mpu9250_handle->data.gyro.cal.var[INV_FSR_1000DPS].array[Z_POS]));
+
+    ESP_ERROR_CHECK(nvs_get_u16(my_handle, "X_VAR_2000", &mpu9250_handle->data.gyro.cal.var[INV_FSR_2000DPS].array[X_POS]));
+    ESP_ERROR_CHECK(nvs_get_u16(my_handle, "Y_VAR_2000", &mpu9250_handle->data.gyro.cal.var[INV_FSR_2000DPS].array[Y_POS]));
+    ESP_ERROR_CHECK(nvs_get_u16(my_handle, "Z_VAR_2000", &mpu9250_handle->data.gyro.cal.var[INV_FSR_2000DPS].array[Z_POS]));
+
+    ESP_ERROR_CHECK(nvs_get_i16(my_handle, "X_SQM_250", &mpu9250_handle->data.gyro.cal.sqm[INV_FSR_250DPS].array[X_POS]));
+    ESP_ERROR_CHECK(nvs_get_i16(my_handle, "Y_SQM_250", &mpu9250_handle->data.gyro.cal.sqm[INV_FSR_250DPS].array[Y_POS]));
+    ESP_ERROR_CHECK(nvs_get_i16(my_handle, "Z_SQM_250", &mpu9250_handle->data.gyro.cal.sqm[INV_FSR_250DPS].array[Z_POS]));
+
+    ESP_ERROR_CHECK(nvs_get_i16(my_handle, "X_SQM_500", &mpu9250_handle->data.gyro.cal.sqm[INV_FSR_500DPS].array[X_POS]));
+    ESP_ERROR_CHECK(nvs_get_i16(my_handle, "Y_SQM_500", &mpu9250_handle->data.gyro.cal.sqm[INV_FSR_500DPS].array[Y_POS]));
+    ESP_ERROR_CHECK(nvs_get_i16(my_handle, "Z_SQM_500", &mpu9250_handle->data.gyro.cal.sqm[INV_FSR_500DPS].array[Z_POS]));
+
+    ESP_ERROR_CHECK(nvs_get_i16(my_handle, "X_SQM_1000", &mpu9250_handle->data.gyro.cal.sqm[INV_FSR_1000DPS].array[X_POS]));
+    ESP_ERROR_CHECK(nvs_get_i16(my_handle, "Y_SQM_1000", &mpu9250_handle->data.gyro.cal.sqm[INV_FSR_1000DPS].array[Y_POS]));
+    ESP_ERROR_CHECK(nvs_get_i16(my_handle, "Z_SQM_1000", &mpu9250_handle->data.gyro.cal.sqm[INV_FSR_1000DPS].array[Z_POS]));
+
+    ESP_ERROR_CHECK(nvs_get_i16(my_handle, "X_SQM_2000", &mpu9250_handle->data.gyro.cal.sqm[INV_FSR_2000DPS].array[X_POS]));
+    ESP_ERROR_CHECK(nvs_get_i16(my_handle, "Y_SQM_2000", &mpu9250_handle->data.gyro.cal.sqm[INV_FSR_2000DPS].array[Y_POS]));
+    ESP_ERROR_CHECK(nvs_get_i16(my_handle, "Z_SQM_2000", &mpu9250_handle->data.gyro.cal.sqm[INV_FSR_2000DPS].array[Z_POS]));
+	printf("Gyro: loaded calibration data from NVS \n");
+    printf("Gyro offsets [%d][%d][%d]:\n", mpu9250_handle->data.gyro.cal.offset.array[X_POS], mpu9250_handle->data.gyro.cal.offset.array[Y_POS],mpu9250_handle->data.gyro.cal.offset.array[Z_POS]);
+    printf("Gyro var [%d][%d][%d]:\n",
+    		mpu9250_handle->data.gyro.cal.var[INV_FSR_250DPS].array[X_POS],
+			mpu9250_handle->data.gyro.cal.var[INV_FSR_250DPS].array[Y_POS],
+			mpu9250_handle->data.gyro.cal.var[INV_FSR_250DPS].array[Z_POS]);
+    printf("Gyro sqm [%d][%d][%d]:\n",
+    		mpu9250_handle->data.gyro.cal.sqm[INV_FSR_250DPS].array[X_POS],
+			mpu9250_handle->data.gyro.cal.sqm[INV_FSR_250DPS].array[Y_POS],
+			mpu9250_handle->data.gyro.cal.sqm[INV_FSR_250DPS].array[Z_POS]);
+
+    // Close
+    nvs_close(my_handle);
+
+	return ESP_OK;
+}
 
 static esp_err_t mpu9250_gyro_save_fsr(mpu9250_handle_t mpu9250_handle) {
 	uint8_t gyro_conf = 0;
@@ -50,8 +110,6 @@ static esp_err_t mpu9250_gyro_save_fsr(mpu9250_handle_t mpu9250_handle) {
 }
 
 static esp_err_t mpu9250_gyro_init_kalman_filter(mpu9250_handle_t mpu9250_handle) {
-	const TickType_t xMaxBlockTime = pdMS_TO_TICKS( 500 );
-
 	for(uint8_t i = 0; i < 3; i++) {
 		mpu9250_handle->data.gyro.cal.kalman[i].X = mpu9250_handle->data.gyro.lsb;
 		mpu9250_handle->data.gyro.cal.kalman[i].sample=0;
@@ -98,86 +156,6 @@ static esp_err_t mpu9250_gyro_save_offset(mpu9250_handle_t mpu9250_handle) {
 	esp_err_t ret = mpu9250_write_buff(mpu9250_handle, MPU9250_XG_OFFSET_H, buff, 6*8);
 	return ret;
 }
-/*
-Final Acc offsets: [6786][-5534][9809]
-Final Gyro offsets: [350][-32][-18]
-MPU9250: AccFSR 16g
-MPU9250: GyroFSR 2000dps
-Discarding 10000 Samples ...
-Calculating Biases ...
-Calculating Var with 10000 samples (wait for 10 seconds)...
-Acc_var: [2][1][2]
-Gyro_var: [0][0][0]
-Acc_sqm: [1][1][1]
-Gyro_sqm: [0][0][0]
-MPU9250: AccFSR 8g
-MPU9250: GyroFSR 1000dps
-Discarding 10000 Samples ...
-Calculating Means with 10000 samples (wait for 10 seconds)...
-Calculating Biases ...
-Calculating Var with 10000 samples (wait for 10 seconds)...
-Acc_var: [5][7][6]
-Gyro_var: [0][0][0]
-Acc_sqm: [2][2][2]
-Gyro_sqm: [0][0][0]
-MPU9250: AccFSR 4g
-MPU9250: GyroFSR 500dps
-Discarding 10000 Samples ...
-Calculating Means with 10000 samples (wait for 10 seconds)...
-Calculating Biases ...
-Calculating Var with 10000 samples (wait for 10 seconds)...
-Acc_var: [34][56][23]
-Gyro_var: [3][2][2]
-Acc_sqm: [5][7][4]
-Gyro_sqm: [1][1][1]
-MPU9250: AccFSR 2g
-MPU9250: GyroFSR 250dps
-Discarding 10000 Samples ...
-Calculating Means with 10000 samples (wait for 10 seconds)...
-Calculating Biases ...
-Calculating Var with 10000 samples (wait for 10 seconds)...
-Acc_var: [81][69][111]
-Gyro_var: [8][10][6]
-Acc_sqm: [9][8][10]
-Gyro_sqm: [2][3][2]
-
- *
- */
-static esp_err_t mpu9250_gyro_load_statistics(mpu9250_handle_t mpu9250_handle) {
-	mpu9250_handle->data.gyro.cal.offset.array[X_POS]=350;
-	mpu9250_handle->data.gyro.cal.offset.array[Y_POS]=-32;
-	mpu9250_handle->data.gyro.cal.offset.array[Z_POS]=-18;
-
-	mpu9250_handle->data.gyro.cal.var[INV_FSR_250DPS].array[X_POS]=8;
-	mpu9250_handle->data.gyro.cal.var[INV_FSR_250DPS].array[Y_POS]=10;
-	mpu9250_handle->data.gyro.cal.var[INV_FSR_250DPS].array[Z_POS]=6;
-	mpu9250_handle->data.gyro.cal.sqm[INV_FSR_250DPS].array[X_POS]=2;
-	mpu9250_handle->data.gyro.cal.sqm[INV_FSR_250DPS].array[Y_POS]=3;
-	mpu9250_handle->data.gyro.cal.sqm[INV_FSR_250DPS].array[Z_POS]=3;
-
-	mpu9250_handle->data.gyro.cal.var[INV_FSR_500DPS].array[X_POS]=3;
-	mpu9250_handle->data.gyro.cal.var[INV_FSR_500DPS].array[Y_POS]=2;
-	mpu9250_handle->data.gyro.cal.var[INV_FSR_500DPS].array[Z_POS]=2;
-	mpu9250_handle->data.gyro.cal.sqm[INV_FSR_500DPS].array[X_POS]=1;
-	mpu9250_handle->data.gyro.cal.sqm[INV_FSR_500DPS].array[Y_POS]=1;
-	mpu9250_handle->data.gyro.cal.sqm[INV_FSR_500DPS].array[Z_POS]=1;
-
-	mpu9250_handle->data.gyro.cal.var[INV_FSR_1000DPS].array[X_POS]=0;
-	mpu9250_handle->data.gyro.cal.var[INV_FSR_1000DPS].array[Y_POS]=0;
-	mpu9250_handle->data.gyro.cal.var[INV_FSR_1000DPS].array[Z_POS]=0;
-	mpu9250_handle->data.gyro.cal.sqm[INV_FSR_1000DPS].array[X_POS]=0;
-	mpu9250_handle->data.gyro.cal.sqm[INV_FSR_1000DPS].array[Y_POS]=0;
-	mpu9250_handle->data.gyro.cal.sqm[INV_FSR_1000DPS].array[Z_POS]=0;
-
-	mpu9250_handle->data.gyro.cal.var[INV_FSR_2000DPS].array[X_POS]=0;
-	mpu9250_handle->data.gyro.cal.var[INV_FSR_2000DPS].array[Y_POS]=0;
-	mpu9250_handle->data.gyro.cal.var[INV_FSR_2000DPS].array[Z_POS]=0;
-	mpu9250_handle->data.gyro.cal.sqm[INV_FSR_2000DPS].array[X_POS]=0;
-	mpu9250_handle->data.gyro.cal.sqm[INV_FSR_2000DPS].array[Y_POS]=0;
-	mpu9250_handle->data.gyro.cal.sqm[INV_FSR_2000DPS].array[Z_POS]=0;
-
-	return ESP_OK;
-}
 
 static esp_err_t mpu9250_gyro_filter_data(mpu9250_handle_t mpu9250_handle) {
 	for(uint8_t i = 0; i < 3; i++) {
@@ -196,7 +174,7 @@ static esp_err_t mpu9250_gyro_calc_rpy(mpu9250_handle_t mpu9250_handle) {
 	// angolo di rotazione: w(i)=domega(i)*dt espresso in rad
 	double w[3] = {0.0f,0.0f,0.0f};
 	for(uint8_t i = 0; i < 3; i++) {
-		w[i] = (double)(mpu9250_handle->data.gyro.cal.kalman[i].X)/(double)mpu9250_handle->data.gyro.lsb/(double)1000.0f/(double)360.0f*(double)PI_2;
+		w[i] = (double)(mpu9250_handle->data.gyro.cal.kalman[i].X)/(double)mpu9250_handle->data.gyro.lsb/(double)500.0f/(double)360.0f*(double)PI_2;
 	}
 
 	mpu9250_handle->data.gyro.rpy.xyz.x += w[X_POS];
@@ -210,7 +188,7 @@ static esp_err_t mpu9250_gyro_calc_rpy(mpu9250_handle_t mpu9250_handle) {
  ****************** A P I  I M P L E M E N T A T I O N ******************
  ************************************************************************/
 esp_err_t mpu9250_gyro_init(mpu9250_handle_t mpu9250_handle) {
-	mpu9250_gyro_load_statistics(mpu9250_handle); // set offset, var, sqm, P, K
+	mpu9250_gyro_load_calibration_data(mpu9250_handle); // set offset, var, sqm, P, K
 	mpu9250_gyro_save_offset(mpu9250_handle);
 	mpu9250_gyro_init_kalman_filter(mpu9250_handle); // this reset P,K
 	mpu9250_handle->data.gyro.rpy.xyz.x = 0;

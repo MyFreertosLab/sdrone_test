@@ -10,6 +10,8 @@
 #include <freertos/semphr.h>
 #include <rc.h>
 
+#define SDRONE_RC_CHANNEL_RANGE 200
+
 typedef struct {
 	uint16_t min;
 	uint16_t center;
