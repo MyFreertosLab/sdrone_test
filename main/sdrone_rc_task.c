@@ -24,6 +24,7 @@ void sdrone_rc_task(void *arg) {
 
 	ESP_ERROR_CHECK(rc_init(rc_data_local_handle));
 	sdrone_rc_state_handle->rc_task_handle = xTaskGetCurrentTaskHandle();
+	memcpy(&sdrone_rc_state_handle->rc_data, rc_data_local_handle, sizeof(rc_t));
 
 	float scale_factor_left[RC_MAX_CHANNELS];
 	float scale_factor_right[RC_MAX_CHANNELS];
@@ -59,6 +60,8 @@ void sdrone_rc_task(void *arg) {
 			if ((sdrone_rc_state_handle->controller_task_handle != NULL) && (rc_handle->data.txrx_signal != RC_TXRX_TRANSMITTED)) {
 				memcpy(rc_handle, rc_data_local_handle,
 						sizeof(*rc_data_local_handle));
+				// Throttle is in range [0,SDRONE_RC_CHANNEL_RANGE]
+				rc_handle->data.norm[RC_THROTTLE] = rc_data_local_handle->data.norm[RC_THROTTLE]+SDRONE_RC_CHANNEL_RANGE_HALF;
 				xTaskNotify(sdrone_rc_state_handle->controller_task_handle,
 						sdrone_rc_state_handle->driver_id,
 						eSetValueWithOverwrite);

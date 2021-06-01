@@ -22,11 +22,17 @@ void sdrone_controller_init(sdrone_state_handle_t sdrone_state_handle) {
 
 void sdrone_controller_cycle(sdrone_state_handle_t sdrone_state_handle) {
 	rc_data_t rc_data;
-	memset(&rc_data, 0, sizeof(rc_data));
-	rc_data.norm[RC_THROTTLE] = -SDRONE_RC_CHANNEL_RANGE_HALF;
 
 	mpu9250_data_t imu_data;
-	memset(&sdrone_state_handle->imu_state.imu.data, 0, sizeof(sdrone_state_handle->imu_state.imu.data));
+	while (true) {
+		if (ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(100)) == pdPASS) {
+			memcpy(&rc_data, &sdrone_state_handle->rc_state.rc_data.data, sizeof(rc_data));
+			memcpy(&imu_data, &sdrone_state_handle->imu_state.imu.data, sizeof(imu_data));
+			break;
+		} else {
+			printf("wait for initialization complete ...\n");
+		}
+	}
 
 	while (true) {
 		if (ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(100)) != 0) {
@@ -55,7 +61,7 @@ void sdrone_controller_cycle(sdrone_state_handle_t sdrone_state_handle) {
 //			}
 //			printf("\n");
 			sdrone_state_handle->motors_state.input.isCommand = false;
-			sdrone_state_handle->motors_state.input.data.thrust = (rc_data.norm[RC_THROTTLE] + SDRONE_RC_CHANNEL_RANGE_HALF)*SDRONE_NORM_THROTTLE_TO_NEWTON_FACTOR;
+			sdrone_state_handle->motors_state.input.data.thrust = (rc_data.norm[RC_THROTTLE])*SDRONE_NORM_THROTTLE_TO_NEWTON_FACTOR;
 			sdrone_state_handle->motors_state.input.data.tx_rx_flag = MOTORS_TXRX_TRANSMITTED;
 			if (sdrone_state_handle->motors_state.motors_task_handle != NULL) {
 				xTaskNotify(sdrone_state_handle->motors_state.motors_task_handle,

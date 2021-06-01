@@ -39,6 +39,7 @@ void app_main(void)
     xTaskCreate(sdrone_rc_task, "sdrone_rc_task", 2048, &(sdrone_state_handle->rc_state), 10, &rc_task_handle);
     xTaskCreate(sdrone_imu_task, "sdrone_imu_task", 4096, &(sdrone_state_handle->imu_state), 10, &imu_task_handle);
 
+    // Send notification to Controller.
     vTaskDelay(pdMS_TO_TICKS(100));
 
     sdrone_state_handle->motors_state.controller_task_handle = controller_task_handle;
@@ -52,5 +53,8 @@ void app_main(void)
     sdrone_state_handle->imu_state.controller_task_handle = controller_task_handle;
     sdrone_state_handle->imu_state.driver_id = (uint32_t)SDRONE_IMU_DRIVER_ID;
     sdrone_state_handle->imu_state.controller_driver_id = (uint32_t)SDRONE_CONTROLLER_DRIVER_ID;
+	xTaskNotify(controller_task_handle,pdPASS,eSetValueWithOverwrite);
+
+
 }
 
