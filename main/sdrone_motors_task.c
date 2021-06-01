@@ -19,6 +19,7 @@ void sdrone_motors_controller_init(
 	printf("sdrone_motors_controller_init init initial state and motors\n");
 	memset(sdrone_motors_state_handle, 0, sizeof(*sdrone_motors_state_handle));
 	ESP_ERROR_CHECK(motors_init(&(sdrone_motors_state_handle->motors)));
+
 	sdrone_motors_state_handle->motors_task_handle =
 			xTaskGetCurrentTaskHandle();
 	printf(
