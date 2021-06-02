@@ -9,6 +9,9 @@
 #define MAIN_SDRONE_MOTORS_TASK_H_
 #include <freertos/semphr.h>
 #include <motors.h>
+#include <ina3221.h>
+
+#define MOTORS_INA3221_I2C_PORT 1
 
 typedef enum {
 	MOTORS_TXRX_IGNORE = 0,
@@ -56,6 +59,7 @@ typedef struct {
 	sdrone_motors_input_t input;
 	TaskHandle_t controller_task_handle;
 	TaskHandle_t motors_task_handle;
+	ina3221_handle_t ina3221_handle;
 } sdrone_motors_state_t;
 
 typedef sdrone_motors_state_t* sdrone_motors_state_handle_t;

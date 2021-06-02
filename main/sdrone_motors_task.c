@@ -13,8 +13,10 @@
 #include <esp_system.h>
 #include <motors.h>
 #include <sdrone_motors_task.h>
+#include <driver/i2c.h>
+#include <ina3221.h>
 
-void sdrone_motors_controller_init(
+static void sdrone_motors_controller_init(
 		sdrone_motors_state_handle_t sdrone_motors_state_handle) {
 	printf("sdrone_motors_controller_init init initial state and motors\n");
 	memset(sdrone_motors_state_handle, 0, sizeof(*sdrone_motors_state_handle));
@@ -22,8 +24,16 @@ void sdrone_motors_controller_init(
 
 	sdrone_motors_state_handle->motors_task_handle =
 			xTaskGetCurrentTaskHandle();
-	printf(
-			"sdrone_motors_controller_init initial state and motors initialized\n");
+
+	// voltage & current sensor (3 channels);
+	printf("sdrone_motors_controller_init init ina3221 sensor\n");
+	ina3221_t ina3221;
+	ina3221_handle_t ina3221_handle = &ina3221;
+	ina3221_handle->i2c_master_port = MOTORS_INA3221_I2C_PORT;
+	ESP_ERROR_CHECK(ina3221_init(ina3221_handle));
+	ESP_ERROR_CHECK(ina3221_test_connection(ina3221_handle));
+	sdrone_motors_state_handle->ina3221_handle = ina3221_handle;
+	printf("sdrone_motors_controller_init initial state and motors initialized\n");
 }
 
 esp_err_t sdrone_motors_two_horizontal_axis_control(
@@ -37,6 +47,7 @@ esp_err_t sdrone_motors_horizontal_hexacopter_control(
 void sdrone_motors_controller_cycle(
 		sdrone_motors_state_handle_t sdrone_motors_state_handle) {
 	motors_handle_t motors_handle = &(sdrone_motors_state_handle->motors);
+
 	printf("sdrone_motors_task_init::Arm motors\n");
 	ESP_ERROR_CHECK(motors_arm(motors_handle));
 	vTaskDelay(pdMS_TO_TICKS(10));
