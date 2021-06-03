@@ -174,10 +174,9 @@ typedef ina3221_t* ina3221_handle_t;
 esp_err_t ina3221_init(ina3221_handle_t ina3221_handle);
 esp_err_t ina3221_test_connection(ina3221_handle_t ina3221_handle);
 esp_err_t ina3221_read_register(ina3221_handle_t ina3221_handle, uint8_t address, uint16_t* value);
+esp_err_t ina3221_write_register(ina3221_handle_t ina3221_handle, uint8_t address, uint16_t value);
+
 esp_err_t ina3221_is_conversion_ready(ina3221_handle_t ina3221_handle, uint8_t* isRdy);
-esp_err_t ina3221_enable_channel(ina3221_handle_t ina3221_handle, uint16_t channel);
-esp_err_t ina3221_disable_channel(ina3221_handle_t ina3221_handle, uint16_t channel);
-esp_err_t ina3221_enable_channel_summation(ina3221_handle_t ina3221_handle, uint16_t channel);
-esp_err_t ina3221_disable_channel_summation(ina3221_handle_t ina3221_handle, uint16_t channel);
+esp_err_t ina3321_load_data(ina3221_handle_t ina3221_handle);
 
 #endif /* COMPONENTS_DRIVERS_INA3221_INCLUDE_INA3221_H_ */

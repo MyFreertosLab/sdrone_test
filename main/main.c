@@ -13,12 +13,12 @@ static TaskHandle_t motors_task_handle;
 static TaskHandle_t rc_task_handle;
 static TaskHandle_t imu_task_handle;
 
-esp_err_t my_i2c_init(int i2c_master_port) {
+static esp_err_t my_i2c_init(int i2c_master_port) {
 	i2c_config_t conf = {
 	    .mode = I2C_MODE_MASTER,
-	    .sda_io_num = GPIO_NUM_21,         // select GPIO specific to your project
+	    .sda_io_num = GPIO_NUM_4,         // select GPIO specific to your project
 	    .sda_pullup_en = GPIO_PULLUP_ENABLE,
-	    .scl_io_num = GPIO_NUM_22,         // select GPIO specific to your project
+	    .scl_io_num = GPIO_NUM_0,         // select GPIO specific to your project
 	    .scl_pullup_en = GPIO_PULLUP_ENABLE,
 	    .master.clk_speed = 400000,  // select frequency specific to your project
 	    // .clk_flags = 0,          /*!< Optional, you can use I2C_SCLK_SRC_FLAG_* flags to choose i2c source clock here. */
