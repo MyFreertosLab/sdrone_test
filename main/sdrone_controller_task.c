@@ -67,6 +67,10 @@ void sdrone_controller_cycle(sdrone_state_handle_t sdrone_state_handle) {
 				xTaskNotify(sdrone_state_handle->motors_state.motors_task_handle,
 							sdrone_state_handle->driver_id, eSetValueWithOverwrite);
 			}
+			printf("%2.3f, %d;\n",
+					sdrone_state_handle->motors_state.input.data.thrust,
+					sdrone_state_handle->imu_state.imu.data.accel.cal.kalman[Z_POS].X
+				  );
 		} else {
 			// printf("NOT PASS\n");
 		}

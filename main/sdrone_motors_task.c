@@ -28,12 +28,12 @@ void sdrone_motors_controller_init(
 
 	// voltage & current sensor (3 channels);
 	printf("sdrone_motors_controller_init init ina3221 sensor\n");
-	static ina3221_t ina3221;
-	ina3221_handle_t ina3221_handle = &ina3221;
-	ina3221_handle->i2c_master_port = MOTORS_INA3221_I2C_PORT;
-	ESP_ERROR_CHECK(ina3221_init(ina3221_handle));
-	ESP_ERROR_CHECK(ina3221_test_connection(ina3221_handle));
-	sdrone_motors_state_handle->ina3221_handle = ina3221_handle;
+//	static ina3221_t ina3221;
+//	ina3221_handle_t ina3221_handle = &ina3221;
+//	ina3221_handle->i2c_master_port = MOTORS_INA3221_I2C_PORT;
+//	ESP_ERROR_CHECK(ina3221_init(ina3221_handle));
+//	ESP_ERROR_CHECK(ina3221_test_connection(ina3221_handle));
+//	sdrone_motors_state_handle->ina3221_handle = ina3221_handle;
 	printf("sdrone_motors_controller_init initial state and motors initialized\n");
 }
 
@@ -92,21 +92,22 @@ void sdrone_motors_controller_cycle(
 				float duty_prev = motors_handle->motor[1].duty_cycle;
 				ESP_ERROR_CHECK(motors_newton_to_duty(sdrone_motors_state_handle->input.data.thrust, &motors_handle->motor[1].duty_cycle));
 				ESP_ERROR_CHECK(motors_duty_to_newton(motors_handle->motor[1].duty_cycle, &nd));
-				ESP_ERROR_CHECK(ina3321_load_data(sdrone_motors_state_handle->ina3221_handle));
+//				ESP_ERROR_CHECK(ina3321_load_data(sdrone_motors_state_handle->ina3221_handle));
 				motors_handle->motor[0].duty_cycle = motors_handle->motor[1].duty_cycle;
 				motors_handle->motor[2].duty_cycle = motors_handle->motor[1].duty_cycle;
 				motors_handle->motor[3].duty_cycle = motors_handle->motor[1].duty_cycle;
 				motors_handle->motor[4].duty_cycle = motors_handle->motor[1].duty_cycle;
 				motors_handle->motor[5].duty_cycle = motors_handle->motor[1].duty_cycle;
-
-				printf("%5.5f, %d, %d, %d, %d, %d, %d;\n", duty_prev,
-						sdrone_motors_state_handle->ina3221_handle->raw_data.channel_data[0].bus_voltage,
-						sdrone_motors_state_handle->ina3221_handle->raw_data.channel_data[0].shunt_voltage,
-						sdrone_motors_state_handle->ina3221_handle->raw_data.channel_data[1].bus_voltage,
-						sdrone_motors_state_handle->ina3221_handle->raw_data.channel_data[1].shunt_voltage,
-						sdrone_motors_state_handle->ina3221_handle->raw_data.channel_data[2].bus_voltage,
-						sdrone_motors_state_handle->ina3221_handle->raw_data.channel_data[2].shunt_voltage
-					  );
+//				printf("%2.3f, %2.3f, %d, %d, %d, %d, %d, %d;\n",
+//						sdrone_motors_state_handle->input.data.thrust,
+//						duty_prev,
+//						sdrone_motors_state_handle->ina3221_handle->raw_data.channel_data[0].bus_voltage,
+//						sdrone_motors_state_handle->ina3221_handle->raw_data.channel_data[0].shunt_voltage,
+//						sdrone_motors_state_handle->ina3221_handle->raw_data.channel_data[1].bus_voltage,
+//						sdrone_motors_state_handle->ina3221_handle->raw_data.channel_data[1].shunt_voltage,
+//						sdrone_motors_state_handle->ina3221_handle->raw_data.channel_data[2].bus_voltage,
+//						sdrone_motors_state_handle->ina3221_handle->raw_data.channel_data[2].shunt_voltage
+//					  );
 
 				ESP_ERROR_CHECK(motors_update(motors_handle));
 				sdrone_motors_state_handle->input.data.tx_rx_flag =

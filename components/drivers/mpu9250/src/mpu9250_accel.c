@@ -56,10 +56,12 @@ static esp_err_t mpu9250_acc_init_kalman_filter(mpu9250_handle_t mpu9250_handle)
 	for(uint8_t i = 0; i < 3; i++) {
 		mpu9250_handle->data.accel.cal.kalman[i].X = mpu9250_handle->data.accel.lsb;
 		mpu9250_handle->data.accel.cal.kalman[i].sample=0;
-		mpu9250_handle->data.accel.cal.kalman[i].P=1.0f;
+		mpu9250_handle->data.accel.cal.kalman[i].P=300.0f;
+//		mpu9250_handle->data.accel.cal.kalman[i].P=1.0f;
 		mpu9250_handle->data.accel.cal.kalman[i].Q=1.5;
 		mpu9250_handle->data.accel.cal.kalman[i].K=0.0f;
-		mpu9250_handle->data.accel.cal.kalman[i].R=mpu9250_handle->data.accel.cal.var[mpu9250_handle->data.accel.fsr].array[i];
+		mpu9250_handle->data.accel.cal.kalman[i].R=8141.7623;
+//		mpu9250_handle->data.accel.cal.kalman[i].R=mpu9250_handle->data.accel.cal.var[mpu9250_handle->data.accel.fsr].array[i];
 		if(mpu9250_handle->data.accel.cal.kalman[i].R == 0) {
 			//TODO: verificare .. se R è 0 invalida il filtro
 			mpu9250_handle->data.accel.cal.kalman[i].R = 1;
