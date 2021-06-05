@@ -278,7 +278,7 @@ esp_err_t motors_init(motors_handle_t motors_handle) {
 	ESP_ERROR_CHECK(motors_init_mcpwm(motors_handle, MCPWM_UNIT_0));
 	ESP_ERROR_CHECK(motors_init_mcpwm(motors_handle, MCPWM_UNIT_1));
     vTaskDelay(500); //delay of 5s (at 100Hz)
-    //ESP_ERROR_CHECK(motors_high_duty_motors(motors_handle));
+    ESP_ERROR_CHECK(motors_high_duty_motors(motors_handle));
 	ESP_ERROR_CHECK(motors_switchon(motors_handle));
     vTaskDelay(200); //delay of 2s (at 100Hz)
     ESP_ERROR_CHECK(motors_low_duty_motors(motors_handle));
