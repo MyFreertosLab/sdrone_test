@@ -33,9 +33,11 @@ void sdrone_controller_cycle(sdrone_state_handle_t sdrone_state_handle) {
 			printf("wait for initialization complete ...\n");
 		}
 	}
-
+	uint16_t counter = 0;
 	while (true) {
 		if (ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(100)) != 0) {
+			counter++;
+			counter %=200;
 			if(sdrone_state_handle->rc_state.rc_data.data.txrx_signal == RC_TXRX_TRANSMITTED) {
 				memcpy(&rc_data, &sdrone_state_handle->rc_state.rc_data.data, sizeof(rc_data));
 				sdrone_state_handle->rc_state.rc_data.data.txrx_signal = RC_TXRX_RECEIVED;
@@ -43,23 +45,18 @@ void sdrone_controller_cycle(sdrone_state_handle_t sdrone_state_handle) {
 			if(sdrone_state_handle->imu_state.imu.data.txrx_signal == IMU_TXRX_TRANSMITTED) {
 				memcpy(&imu_data, &sdrone_state_handle->imu_state.imu.data, sizeof(imu_data));
 				sdrone_state_handle->imu_state.imu.data.txrx_signal = IMU_TXRX_RECEIVED;
-//				if(counter == 0) {
-//					printf("Gyro.: S[%d][%d][%d] X[%d][%d][%d]\n", imu_data.gyro.cal.kalman[X_POS].sample, imu_data.gyro.cal.kalman[Y_POS].sample, imu_data.gyro.cal.kalman[Z_POS].sample, imu_data.gyro.cal.kalman[X_POS].X , imu_data.gyro.cal.kalman[Y_POS].X, imu_data.gyro.cal.kalman[Z_POS].X);
-//					printf("Accel: S[%d][%d][%d] X[%d][%d][%d]\n", imu_data.accel.cal.kalman[X_POS].sample, imu_data.accel.cal.kalman[Y_POS].sample, imu_data.accel.cal.kalman[Z_POS].sample, imu_data.accel.cal.kalman[X_POS].X , imu_data.accel.cal.kalman[Y_POS].X, imu_data.accel.cal.kalman[Z_POS].X);
-//					printf("AG[%2.2f][%2.2f][%2.2f] RPY[%2.2f][%2.2f][%2.2f]\n", imu_data.attitude[X_POS], imu_data.attitude[Y_POS], imu_data.attitude[Z_POS], imu_data.gyro.rpy.xyz.x*(double)360.0f/(double)6.283185307f, imu_data.gyro.rpy.xyz.y*(double)360.0f/(double)6.283185307f, imu_data.gyro.rpy.xyz.z*(double)360.0f/(double)6.283185307f);
-//					printf("AA[%2.2f][%2.2f][%2.2f] RPY[%2.2f][%2.2f][%2.2f]\n", imu_data.attitude[X_POS], imu_data.attitude[Y_POS], imu_data.attitude[Z_POS], imu_data.accel.rpy.xyz.x*(double)360.0f/(double)6.283185307f, imu_data.accel.rpy.xyz.y*(double)360.0f/(double)6.283185307f, imu_data.accel.rpy.xyz.z*(double)360.0f/(double)6.283185307f);
-//					printf("KG[%1.5f][%1.5f][%1.5f]\n", imu_data.gyro.cal.kalman[X_POS].K, imu_data.gyro.cal.kalman[Y_POS].K, imu_data.gyro.cal.kalman[Z_POS].K );
-//					for (uint8_t i = 0; i < RC_MAX_CHANNELS; i++) {
-//						printf("%d-%04d ", i, rc_data.norm[i]);
-//					}
-//					printf("\n");
-//				}
+				if(counter == 0) {
+					//			printf("%2.3f, %d;\n",
+					//					sdrone_state_handle->motors_state.input.data.thrust,
+					//					sdrone_state_handle->imu_state.imu.data.accel.cal.kalman[Z_POS].X
+					//				  );
+					printf("Gyro.: S[%d][%d][%d] X[%d][%d][%d]\n", imu_data.gyro.cal.kalman[X_POS].sample, imu_data.gyro.cal.kalman[Y_POS].sample, imu_data.gyro.cal.kalman[Z_POS].sample, imu_data.gyro.cal.kalman[X_POS].X , imu_data.gyro.cal.kalman[Y_POS].X, imu_data.gyro.cal.kalman[Z_POS].X);
+					printf("Accel: S[%d][%d][%d] X[%d][%d][%d]\n", imu_data.accel.cal.kalman[X_POS].sample, imu_data.accel.cal.kalman[Y_POS].sample, imu_data.accel.cal.kalman[Z_POS].sample, imu_data.accel.cal.kalman[X_POS].X , imu_data.accel.cal.kalman[Y_POS].X, imu_data.accel.cal.kalman[Z_POS].X);
+					printf("AG[%2.2f][%2.2f][%2.2f] RPY[%2.2f][%2.2f][%2.2f]\n", imu_data.attitude[X_POS], imu_data.attitude[Y_POS], imu_data.attitude[Z_POS], imu_data.gyro.rpy.xyz.x*(double)360.0f/(double)6.283185307f, imu_data.gyro.rpy.xyz.y*(double)360.0f/(double)6.283185307f, imu_data.gyro.rpy.xyz.z*(double)360.0f/(double)6.283185307f);
+					printf("AA[%2.2f][%2.2f][%2.2f] RPY[%2.2f][%2.2f][%2.2f]\n", imu_data.attitude[X_POS], imu_data.attitude[Y_POS], imu_data.attitude[Z_POS], imu_data.accel.rpy.xyz.x*(double)360.0f/(double)6.283185307f, imu_data.accel.rpy.xyz.y*(double)360.0f/(double)6.283185307f, imu_data.accel.rpy.xyz.z*(double)360.0f/(double)6.283185307f);
+					printf("KG[%1.5f][%1.5f][%1.5f]\n", imu_data.gyro.cal.kalman[X_POS].K, imu_data.gyro.cal.kalman[Y_POS].K, imu_data.gyro.cal.kalman[Z_POS].K );
+				}
 			}
-//			for (uint8_t i = 0; i < RC_MAX_CHANNELS; i++) {
-//				printf("%d-%04d ", i,
-//						rc_channels[i]);
-//			}
-//			printf("\n");
 			sdrone_state_handle->motors_state.input.isCommand = false;
 			sdrone_state_handle->motors_state.input.data.thrust = (rc_data.norm[RC_THROTTLE])*SDRONE_NORM_THROTTLE_TO_NEWTON_FACTOR;
 			sdrone_state_handle->motors_state.input.data.tx_rx_flag = MOTORS_TXRX_TRANSMITTED;
@@ -67,10 +64,6 @@ void sdrone_controller_cycle(sdrone_state_handle_t sdrone_state_handle) {
 				xTaskNotify(sdrone_state_handle->motors_state.motors_task_handle,
 							sdrone_state_handle->driver_id, eSetValueWithOverwrite);
 			}
-			printf("%2.3f, %d;\n",
-					sdrone_state_handle->motors_state.input.data.thrust,
-					sdrone_state_handle->imu_state.imu.data.accel.cal.kalman[Z_POS].X
-				  );
 		} else {
 			// printf("NOT PASS\n");
 		}
