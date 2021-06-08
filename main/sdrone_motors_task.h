@@ -28,7 +28,7 @@ typedef enum {
 typedef struct {
 	float desired_omega;
 	float actual_omega;
-	float thrust;
+	float thrust[MOTORS_MAX_NUM];
 	motors_status_t desired_motors_status;
 	volatile sdrone_motors_tx_rx_mask_t tx_rx_flag;
 } sdrone_motors_input_data_t;

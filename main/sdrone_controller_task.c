@@ -66,7 +66,6 @@ esp_err_t sdrone_controller_two_horizontal_axis_control(
 	sdrone_state_handle->controller_state.X[SDRONE_ALFA_POS] =
 			((double) sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]
 					- prevOmega);
-//					* (double) sdrone_state_handle->imu_state.imu.data_rate;
 
 	// new state (only for prediction)
 	X[SDRONE_TETA_POS] =
@@ -84,25 +83,43 @@ esp_err_t sdrone_controller_two_horizontal_axis_control(
 	// response
 	Y[0] = -sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]*SDRONE_AXIS_LENGTH/(2.0f)
 			+ sdrone_state_handle->controller_state.U[SDRONE_TETA_POS]
-					* SDRONE_AXIS_LENGTH / (2.0f * SDRONE_REF_SIGNAL_DT)
-			+ 0.5f * sdrone_state_handle->controller_state.U[SDRONE_THRUST_POS];
+					* SDRONE_AXIS_LENGTH / (2.0f * SDRONE_REF_SIGNAL_DT);
 	Y[1] = sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]*SDRONE_AXIS_LENGTH/(2.0f)
 			- sdrone_state_handle->controller_state.U[SDRONE_TETA_POS]
-					* SDRONE_AXIS_LENGTH / (2.0f * SDRONE_REF_SIGNAL_DT)
-			+ 0.5f * sdrone_state_handle->controller_state.U[SDRONE_THRUST_POS];
+					* SDRONE_AXIS_LENGTH / (2.0f * SDRONE_REF_SIGNAL_DT);
 
-	printf("XP[%5.3f, %5.3f, %5.3f]\n", X[0], X[1], X[2]);
-	printf("XC[%5.3f, %5.3f, %5.3f]\n",
-			sdrone_state_handle->controller_state.X[SDRONE_TETA_POS],
-			sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS],
-			sdrone_state_handle->controller_state.X[SDRONE_ALFA_POS]);
-	printf("Y[%5.3f, %5.3f]\n", Y[0], Y[1]);
-	printf("U[%5.3f, %5.3f]\n", sdrone_state_handle->controller_state.U[SDRONE_TETA_POS], sdrone_state_handle->controller_state.U[SDRONE_THRUST_POS]);
+	// from accel to newton
+	Y[0] = Y[0] + 0.5f * sdrone_state_handle->controller_state.U[SDRONE_THRUST_POS];
+	Y[1] = Y[1] + 0.5f * sdrone_state_handle->controller_state.U[SDRONE_THRUST_POS];
+
+	// constraints
+	if(Y[0] < 0.0f) {
+		Y[0] = 0.0f;
+	} else if(Y[1] < 0.0f) {
+		Y[1] = 0.0f;
+	}
+	if(Y[0] > MOTORS_ACCEL_RANGE) {
+		Y[0] = MOTORS_ACCEL_RANGE;
+	}
+	if(Y[1] > MOTORS_ACCEL_RANGE) {
+		Y[1] = MOTORS_ACCEL_RANGE;
+	}
+	sdrone_state_handle->motors_state.input.data.thrust[1] = Y[0]; // right motor
+	sdrone_state_handle->motors_state.input.data.thrust[0] = Y[1]; // left motor
+
 	return ESP_OK;
 }
 #endif
 #endif
+void sdrone_controller_print_data(sdrone_state_handle_t sdrone_state_handle) {
+		printf("XC[%5.3f, %5.3f, %5.3f]\n",
+				sdrone_state_handle->controller_state.X[SDRONE_TETA_POS],
+				sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS],
+				sdrone_state_handle->controller_state.X[SDRONE_ALFA_POS]);
+		printf("Y[%5.3f, %5.3f]\n", sdrone_state_handle->motors_state.input.data.thrust[1], sdrone_state_handle->motors_state.input.data.thrust[0]);
+		printf("U[%5.3f, %5.3f]\n", sdrone_state_handle->controller_state.U[SDRONE_TETA_POS], sdrone_state_handle->controller_state.U[SDRONE_THRUST_POS]);
 
+}
 void sdrone_controller_cycle(sdrone_state_handle_t sdrone_state_handle) {
 	rc_data_t rc_data;
 
@@ -136,7 +153,6 @@ void sdrone_controller_cycle(sdrone_state_handle_t sdrone_state_handle) {
 						sizeof(imu_data));
 				sdrone_state_handle->imu_state.imu.data.txrx_signal =
 						IMU_TXRX_RECEIVED;
-				if (counter == 0) {
 					//			printf("%2.3f, %d;\n",
 					//					sdrone_state_handle->motors_state.input.data.thrust,
 					//					sdrone_state_handle->imu_state.imu.data.accel.cal.kalman[Z_POS].X
@@ -157,9 +173,6 @@ void sdrone_controller_cycle(sdrone_state_handle_t sdrone_state_handle) {
 #endif
 #endif
 					sdrone_state_handle->motors_state.input.isCommand = false;
-					sdrone_state_handle->motors_state.input.data.thrust =
-							(rc_data.norm[RC_THROTTLE])
-									* SDRONE_NORM_THROTTLE_TO_ACCEL_FACTOR;
 					sdrone_state_handle->motors_state.input.data.tx_rx_flag =
 							MOTORS_TXRX_TRANSMITTED;
 					if (sdrone_state_handle->motors_state.motors_task_handle
@@ -169,7 +182,9 @@ void sdrone_controller_cycle(sdrone_state_handle_t sdrone_state_handle) {
 								sdrone_state_handle->driver_id,
 								eSetValueWithOverwrite);
 					}
-				}
+					if(counter == 0) {
+						sdrone_controller_print_data(sdrone_state_handle);
+					}
 			}
 		} else {
 			// printf("NOT PASS\n");

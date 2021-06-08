@@ -37,14 +37,6 @@ void sdrone_motors_controller_init(
 	printf("sdrone_motors_controller_init initial state and motors initialized\n");
 }
 
-esp_err_t sdrone_motors_two_horizontal_axis_control(
-		sdrone_motors_state_handle_t sdrone_motors_state_handle) {
-	return ESP_OK;
-}
-esp_err_t sdrone_motors_horizontal_hexacopter_control(
-		sdrone_motors_state_handle_t sdrone_motors_state_handle) {
-	return ESP_OK;
-}
 void sdrone_motors_controller_cycle(
 		sdrone_motors_state_handle_t sdrone_motors_state_handle) {
 	motors_handle_t motors_handle = &(sdrone_motors_state_handle->motors);
@@ -83,21 +75,15 @@ void sdrone_motors_controller_cycle(
 				}
 			} else if (sdrone_motors_state_handle->input.data.tx_rx_flag
 					== MOTORS_TXRX_TRANSMITTED) {
-				/*
-				 * load input data to local var
-				 *
-				 * TODO: REMOVE and IMPLEMENTS this function. This is for my tests.
-				 */
-				float nd = 0;
-				float duty_prev = motors_handle->motor[1].duty_cycle;
-				ESP_ERROR_CHECK(motors_newton_to_duty(sdrone_motors_state_handle->input.data.thrust, &motors_handle->motor[1].duty_cycle));
-				ESP_ERROR_CHECK(motors_duty_to_newton(motors_handle->motor[1].duty_cycle, &nd));
+#ifdef MOTORS_FRAME_HORIZONTAL_HEXACOPTER
+				// TODO: T.B.D.
+#else
+#ifdef MOTORS_FRAME_TWO_HORIZONTAL_AXIS
+				ESP_ERROR_CHECK(motors_newton_to_duty(sdrone_motors_state_handle->input.data.thrust[0], &motors_handle->motor[0].duty_cycle));
+				ESP_ERROR_CHECK(motors_newton_to_duty(sdrone_motors_state_handle->input.data.thrust[1], &motors_handle->motor[1].duty_cycle));
+#endif
+#endif
 //				ESP_ERROR_CHECK(ina3321_load_data(sdrone_motors_state_handle->ina3221_handle));
-				motors_handle->motor[0].duty_cycle = motors_handle->motor[1].duty_cycle;
-				motors_handle->motor[2].duty_cycle = motors_handle->motor[1].duty_cycle;
-				motors_handle->motor[3].duty_cycle = motors_handle->motor[1].duty_cycle;
-				motors_handle->motor[4].duty_cycle = motors_handle->motor[1].duty_cycle;
-				motors_handle->motor[5].duty_cycle = motors_handle->motor[1].duty_cycle;
 //				printf("%2.3f, %2.3f, %d, %d, %d, %d, %d, %d;\n",
 //						sdrone_motors_state_handle->input.data.thrust,
 //						duty_prev,
@@ -113,22 +99,6 @@ void sdrone_motors_controller_cycle(
 				sdrone_motors_state_handle->input.data.tx_rx_flag =
 						MOTORS_TXRX_RECEIVED;
 			}
-			/*
-			 * calc Y(i) for each motor
-			 * calc duty_cycle for each motor
-			 * not interrompible
-			 *   update motors
-			 */
-
-#ifdef MOTORS_FRAME_HORIZONTAL_HEXACOPTER
-	      ESP_ERROR_CHECK(sdrone_motors_horizontal_hexacopter_control(sdrone_motors_state_handle));
-#else
-#ifdef MOTORS_FRAME_TWO_HORIZONTAL_AXIS
-			ESP_ERROR_CHECK(
-					sdrone_motors_two_horizontal_axis_control(
-							sdrone_motors_state_handle));
-#endif
-#endif
 		}
 	}
 }

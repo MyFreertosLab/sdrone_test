@@ -238,12 +238,12 @@ esp_err_t motors_config_switchonoff_pin(motors_handle_t motors_handle) {
  ****************** A P I  I M P L E M E N T A T I O N ******************
  ************************************************************************/
 esp_err_t motors_newton_to_duty(float newton, float* duty) {
-	if(newton <= (MOTORS_DUTY_DEAD_RANGE - MOTORS_DUTY_MAX_ZERO)*MOTORS_DUTY_TO_ACCEL_FACTOR_LOW) {
+	if(newton <= (MOTORS_DUTY_DEAD_RANGE - MOTORS_DUTY_MAX_ZERO)*MOTORS_DUTY_TO_NEWTON_FACTOR_LOW) {
 		*duty = MOTORS_DUTY_MAX_ZERO;
-	} else if(newton <= (MOTORS_DUTY_MAX_LOW - MOTORS_DUTY_MAX_ZERO)*MOTORS_DUTY_TO_ACCEL_FACTOR_LOW) {
-		*duty = MOTORS_DUTY_MAX_ZERO + newton/MOTORS_DUTY_TO_ACCEL_FACTOR_LOW;
+	} else if(newton <= (MOTORS_DUTY_MAX_LOW - MOTORS_DUTY_MAX_ZERO)*MOTORS_DUTY_TO_NEWTON_FACTOR_LOW) {
+		*duty = MOTORS_DUTY_MAX_ZERO + newton/MOTORS_DUTY_TO_NEWTON_FACTOR_LOW;
 	} else {
-		*duty = MOTORS_DUTY_MAX_LOW + (newton - (MOTORS_DUTY_MAX_LOW - MOTORS_DUTY_MAX_ZERO)*MOTORS_DUTY_TO_ACCEL_FACTOR_LOW)/MOTORS_DUTY_TO_ACCEL_FACTOR_HIGH;
+		*duty = MOTORS_DUTY_MAX_LOW + (newton - (MOTORS_DUTY_MAX_LOW - MOTORS_DUTY_MAX_ZERO)*MOTORS_DUTY_TO_NEWTON_FACTOR_LOW)/MOTORS_DUTY_TO_NEWTON_FACTOR_HIGH;
 	}
 	return ESP_OK;
 }
@@ -252,9 +252,9 @@ esp_err_t motors_duty_to_newton(float duty, float* newton) {
 	if(duty <= MOTORS_DUTY_DEAD_RANGE) {
 		*newton = 0.0f;
 	} else if(duty < MOTORS_DUTY_MAX_LOW) {
-		*newton = (duty - MOTORS_DUTY_MAX_ZERO)*MOTORS_DUTY_TO_ACCEL_FACTOR_LOW;
+		*newton = (duty - MOTORS_DUTY_MAX_ZERO)*MOTORS_DUTY_TO_NEWTON_FACTOR_LOW;
 	} else {
-		*newton = (MOTORS_DUTY_MAX_LOW-MOTORS_DUTY_MAX_ZERO)*MOTORS_DUTY_TO_ACCEL_FACTOR_LOW + (duty - MOTORS_DUTY_MAX_LOW)*MOTORS_DUTY_TO_ACCEL_FACTOR_HIGH;
+		*newton = (MOTORS_DUTY_MAX_LOW-MOTORS_DUTY_MAX_ZERO)*MOTORS_DUTY_TO_NEWTON_FACTOR_LOW + (duty - MOTORS_DUTY_MAX_LOW)*MOTORS_DUTY_TO_NEWTON_FACTOR_HIGH;
 	}
 	return ESP_OK;
 }
