@@ -272,7 +272,7 @@ esp_err_t sdrone_controller_two_horizontal_axis_control(
 					* SDRONE_AXIS_LENGTH / (2.0f)
 		;
 	sdrone_state_handle->controller_state.predX[SDRONE_OMEGA_POS] =
-			( sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]
+			( - sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]
 		      + sdrone_state_handle->controller_state.U[SDRONE_TETA_POS]
 					/ SDRONE_REF_SIGNAL_DT)
 					* SDRONE_AXIS_LENGTH / (2.0f)
