@@ -262,34 +262,37 @@ esp_err_t sdrone_controller_two_horizontal_axis_control(
 					- sdrone_state_handle->controller_state.X[SDRONE_ALFA_POS];
 
 	// Calc new prediction
+
+	// pred teta
 	sdrone_state_handle->controller_state.predX[SDRONE_TETA_POS] =
 			sdrone_state_handle->controller_state.X[SDRONE_TETA_POS]
-					+ sdrone_state_handle->controller_state.U[SDRONE_TETA_POS];
+			+ sdrone_state_handle->controller_state.U[SDRONE_TETA_POS] * SDRONE_REF_SIGNAL_DT;
+
+	// pred alfa
 	sdrone_state_handle->controller_state.predX[SDRONE_ALFA_POS] =
-			(-sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]
-					+ sdrone_state_handle->controller_state.U[SDRONE_TETA_POS]
-							/ SDRONE_REF_SIGNAL_DT)
-					* SDRONE_AXIS_LENGTH / (2.0f)
+			((- sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]
+			 + sdrone_state_handle->controller_state.U[SDRONE_TETA_POS] / SDRONE_REF_SIGNAL_DT
+			) * SDRONE_AXIS_LENGTH) * SDRONE_AXIS_LENGTH
 		;
+	// pred omega
 	sdrone_state_handle->controller_state.predX[SDRONE_OMEGA_POS] =
-			( - sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]
-		      + sdrone_state_handle->controller_state.U[SDRONE_TETA_POS]
-					/ SDRONE_REF_SIGNAL_DT)
-					* SDRONE_AXIS_LENGTH / (2.0f)
+			(   sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]
+		      + sdrone_state_handle->controller_state.predX[SDRONE_ALFA_POS]
+			)
 		;
 
 	// response
-	Y[0] = (-sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]
-			* SDRONE_AXIS_LENGTH / (2.0f)
+	Y[0] = (- sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]
 			+ sdrone_state_handle->controller_state.U[SDRONE_TETA_POS]
-					* SDRONE_AXIS_LENGTH / (2.0f * SDRONE_REF_SIGNAL_DT))
-			+ sdrone_state_handle->controller_state.err[SDRONE_OMEGA_POS]* SDRONE_AXIS_LENGTH / (2.0f)
+					/ SDRONE_REF_SIGNAL_DT
+		   ) * SDRONE_AXIS_LENGTH / (2.0f)
+//			+ sdrone_state_handle->controller_state.err[SDRONE_OMEGA_POS]* SDRONE_AXIS_LENGTH / (2.0f)
 			;
-	Y[1] = (sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]
-			* SDRONE_AXIS_LENGTH / (2.0f)
+	Y[1] = (  sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]
 			- sdrone_state_handle->controller_state.U[SDRONE_TETA_POS]
-					* SDRONE_AXIS_LENGTH / (2.0f * SDRONE_REF_SIGNAL_DT))
-			- sdrone_state_handle->controller_state.err[SDRONE_OMEGA_POS]* SDRONE_AXIS_LENGTH / (2.0f)
+					/ SDRONE_REF_SIGNAL_DT
+		   ) * SDRONE_AXIS_LENGTH / (2.0f)
+//			- sdrone_state_handle->controller_state.err[SDRONE_OMEGA_POS]* SDRONE_AXIS_LENGTH / (2.0f)
 			;
 
 	// from accel to newton
