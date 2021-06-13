@@ -80,12 +80,12 @@ void sdrone_controller_print_data(sdrone_state_handle_t sdrone_state_handle) {
 	//			sdrone_state_handle->controller_state.predX[SDRONE_TETA_POS],
 	//			sdrone_state_handle->controller_state.predX[SDRONE_OMEGA_POS],
 	//			sdrone_state_handle->controller_state.predX[SDRONE_ALFA_POS]);
-			printf("X[%5.3f, %5.3f, %5.3f]\n",
-					sdrone_state_handle->controller_state.X[SDRONE_TETA_POS],
-					sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS],
-					sdrone_state_handle->controller_state.X[SDRONE_ALFA_POS]);
+//			printf("X[%5.3f, %5.3f, %5.3f]\n",
+//					sdrone_state_handle->controller_state.X[SDRONE_TETA_POS],
+//					sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS],
+//					sdrone_state_handle->controller_state.X[SDRONE_ALFA_POS]);
 	//		printf("Y[%5.3f, %5.3f]\n", sdrone_state_handle->motors_state.input.data.thrust[1], sdrone_state_handle->motors_state.input.data.thrust[0]);
-			printf("U[%5.3f, %5.3f]\n", sdrone_state_handle->controller_state.U[SDRONE_TETA_POS], sdrone_state_handle->controller_state.U[SDRONE_THRUST_POS]);
+//			printf("U[%5.3f, %5.3f]\n", sdrone_state_handle->controller_state.U[SDRONE_TETA_POS], sdrone_state_handle->controller_state.U[SDRONE_THRUST_POS]);
 	//		printf("E[%5.3f, %5.3f, %5.3f]\n",
 	//				sdrone_state_handle->controller_state.err[SDRONE_TETA_POS],
 	//				sdrone_state_handle->controller_state.err[SDRONE_OMEGA_POS],
@@ -286,13 +286,13 @@ esp_err_t sdrone_controller_two_horizontal_axis_control(
 			+ sdrone_state_handle->controller_state.U[SDRONE_TETA_POS]
 					/ SDRONE_REF_SIGNAL_DT
 		   ) * SDRONE_AXIS_LENGTH / (2.0f)
-//			+ sdrone_state_handle->controller_state.err[SDRONE_OMEGA_POS]* SDRONE_AXIS_LENGTH / (2.0f)
+		   + sdrone_state_handle->controller_state.err[SDRONE_ALFA_POS]
 			;
 	Y[1] = (  sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]
 			- sdrone_state_handle->controller_state.U[SDRONE_TETA_POS]
 					/ SDRONE_REF_SIGNAL_DT
 		   ) * SDRONE_AXIS_LENGTH / (2.0f)
-//			- sdrone_state_handle->controller_state.err[SDRONE_OMEGA_POS]* SDRONE_AXIS_LENGTH / (2.0f)
+		   - sdrone_state_handle->controller_state.err[SDRONE_ALFA_POS]
 			;
 
 	// from accel to newton
