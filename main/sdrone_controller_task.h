@@ -25,7 +25,7 @@
 #define SDRONE_OMEGA_POS   1
 #define SDRONE_ALFA_POS    2
 #define SDRONE_THRUST_POS  1
-#define SDRONE_MISUREMENT_MODE
+//#define SDRONE_MISUREMENT_MODE
 
 typedef enum {
 	SDRONE_MOTORS_DRIVER_ID = 1,
@@ -62,8 +62,14 @@ typedef struct {
 typedef struct {
 	float X[3]; // [teta, omega, alfa] (radians)
 	float U[2]; // [teta, thrust] (radians, newton)
-	float err[3]; // errors= predX(k) - X(k+1) [dteta, domega, dalfa] (radians)
+	float err[3]; // error
+	float ierr[3]; // integral error
+	float derr[3]; // derivative error
 	float predX[3]; // [teta, omega, alfa] (radians)
+	float ke;
+	float ki;
+	float kd;
+	float prevErr[3]; // previous error
 #ifdef SDRONE_MISUREMENT_MODE
 	sdrone_misurement_status_t misurement_state;
 #endif
