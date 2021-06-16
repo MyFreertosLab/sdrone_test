@@ -67,6 +67,7 @@ esp_err_t mpu9250_init(mpu9250_handle_t mpu9250_handle) {
 	for(uint8_t i = 0; i < 3; i++) {
 		mpu9250_cb_init(&mpu9250_handle->data.accel.cb[i]);
 		mpu9250_cb_init(&mpu9250_handle->data.gyro.cb[i]);
+		mpu9250_cb_init(&mpu9250_handle->data.gyro.cb_alfa[i]);
 	}
 
     // set Configuration Register

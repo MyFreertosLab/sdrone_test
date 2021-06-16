@@ -49,13 +49,13 @@ void app_main(void)
 	ESP_ERROR_CHECK(my_i2c_init(1));
 
 	// init controller (this must be the first)
-    xTaskCreate(sdrone_controller_task, "sdrone_controller_task", 4096, sdrone_state_handle, 5, &controller_task_handle);
+    xTaskCreate(sdrone_controller_task, "sdrone_controller_task", 4096, sdrone_state_handle, 8, &controller_task_handle);
 
     // init actuators
-    xTaskCreate(sdrone_motors_task, "sdrone_motors_task", 4096, &(sdrone_state_handle->motors_state), 5, &motors_task_handle);
+    xTaskCreate(sdrone_motors_task, "sdrone_motors_task", 4096, &(sdrone_state_handle->motors_state), 9, &motors_task_handle);
 
     // init sensors
-    xTaskCreate(sdrone_rc_task, "sdrone_rc_task", 2048, &(sdrone_state_handle->rc_state), 10, &rc_task_handle);
+    xTaskCreate(sdrone_rc_task, "sdrone_rc_task", 2048, &(sdrone_state_handle->rc_state), 5, &rc_task_handle);
     xTaskCreate(sdrone_imu_task, "sdrone_imu_task", 4096, &(sdrone_state_handle->imu_state), 10, &imu_task_handle);
 
     vTaskDelay(pdMS_TO_TICKS(100));

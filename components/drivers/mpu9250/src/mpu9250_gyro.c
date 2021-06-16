@@ -158,13 +158,19 @@ static esp_err_t mpu9250_gyro_save_offset(mpu9250_handle_t mpu9250_handle) {
 }
 
 static esp_err_t mpu9250_gyro_filter_data(mpu9250_handle_t mpu9250_handle) {
+	int16_t alfa_mean;
 	for(uint8_t i = 0; i < 3; i++) {
 		if(mpu9250_handle->data.gyro.cal.kalman[i].P > 0.01) {
 			mpu9250_cb_last(&mpu9250_handle->data.gyro.cb[i], &mpu9250_handle->data.gyro.cal.kalman[i].sample);
+			int16_t prevX = mpu9250_handle->data.gyro.cal.kalman[i].X;
 			mpu9250_handle->data.gyro.cal.kalman[i].P = mpu9250_handle->data.gyro.cal.kalman[i].P+mpu9250_handle->data.gyro.cal.kalman[i].Q;
 			mpu9250_handle->data.gyro.cal.kalman[i].K = mpu9250_handle->data.gyro.cal.kalman[i].P/(mpu9250_handle->data.gyro.cal.kalman[i].P+mpu9250_handle->data.gyro.cal.kalman[i].R);
 			mpu9250_handle->data.gyro.cal.kalman[i].X = mpu9250_handle->data.gyro.cal.kalman[i].X + mpu9250_handle->data.gyro.cal.kalman[i].K*(mpu9250_handle->data.gyro.cal.kalman[i].sample - mpu9250_handle->data.gyro.cal.kalman[i].X);
 			mpu9250_handle->data.gyro.cal.kalman[i].P=(1-mpu9250_handle->data.gyro.cal.kalman[i].K)*mpu9250_handle->data.gyro.cal.kalman[i].P;
+			// in rad/sec/sec
+			mpu9250_cb_add(&mpu9250_handle->data.gyro.cb_alfa[i], mpu9250_handle->data.gyro.cal.kalman[i].X - prevX);
+			mpu9250_cb_means(&mpu9250_handle->data.gyro.cb_alfa[i], &alfa_mean);
+			mpu9250_handle->data.gyro.alfa[i] = (double)alfa_mean*(mpu9250_handle->data_rate/5.0f)/(double)mpu9250_handle->data.gyro.lsb/(double)360.0f*(double)PI_2;
 		}
 	}
 	return ESP_OK;
@@ -194,6 +200,9 @@ esp_err_t mpu9250_gyro_init(mpu9250_handle_t mpu9250_handle) {
 	mpu9250_handle->data.gyro.rpy.xyz.x = 0;
 	mpu9250_handle->data.gyro.rpy.xyz.y = 0;
 	mpu9250_handle->data.gyro.rpy.xyz.z = 0;
+	mpu9250_handle->data.gyro.alfa[X_POS] = 0.0f;
+	mpu9250_handle->data.gyro.alfa[Y_POS] = 0.0f;
+	mpu9250_handle->data.gyro.alfa[Z_POS] = 0.0f;
 	return ESP_OK;
 }
 

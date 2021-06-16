@@ -472,6 +472,8 @@ typedef struct mpu9250_gyro_s {
     float lsb;
 	mpu9250_cb_t cb[3]; // circular buffer
 	mpu9250_rpy_t rpy;
+	mpu9250_cb_t cb_alfa[3]; // circular buffer for alfa
+	float alfa[3];
 } mpu9250_gyro_t;
 
 typedef uint8_t mpu9250_int_status_t;
@@ -513,6 +515,7 @@ typedef mpu9250_init_t* mpu9250_handle_t;
 #define MPU9250_READ_FLAG 0x80
 
 /* Private Methods */
+void mpu9250_cb_add(mpu9250_cb_handle_t cb, int16_t val);
 void mpu9250_cb_means(mpu9250_cb_handle_t cb, int16_t* mean);
 void mpu9250_cb_last(mpu9250_cb_handle_t cb, int16_t* val);
 
