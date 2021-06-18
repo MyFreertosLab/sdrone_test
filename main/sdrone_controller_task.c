@@ -41,8 +41,8 @@ esp_err_t sdrone_controller_two_horizontal_axis_init(
 	sdrone_state_handle->controller_state.ierr[0] = 0.0f;
 	sdrone_state_handle->controller_state.ierr[1] = 0.0f;
 	sdrone_state_handle->controller_state.ierr[2] = 0.0f;
-	sdrone_state_handle->controller_state.ke = 3.0f;
-	sdrone_state_handle->controller_state.ki = 0.004f; //  0.05 con scalino. Ok.
+	sdrone_state_handle->controller_state.ke = 0.45f; // 0.3
+	sdrone_state_handle->controller_state.ki = 0.005f; //  0.05 con scalino. Ok.
 	sdrone_state_handle->controller_state.kd = 58.5f; // 60.0 con scalino. Ok.
 	sdrone_state_handle->controller_state.prevErr[0] = 0.0f;
 	sdrone_state_handle->controller_state.prevErr[1] = 0.0f;
@@ -286,7 +286,6 @@ esp_err_t sdrone_controller_two_horizontal_axis_control(
 	};
 
 	// Calc derivative error
-	// TODO: non serve attenuarlo ...
 	sdrone_state_handle->controller_state.derr[SDRONE_TETA_POS] =
 			sdrone_state_handle->controller_state.err[SDRONE_TETA_POS] - sdrone_state_handle->controller_state.prevErr[SDRONE_TETA_POS];
 	sdrone_state_handle->controller_state.derr[SDRONE_OMEGA_POS] =
@@ -299,41 +298,40 @@ esp_err_t sdrone_controller_two_horizontal_axis_control(
 	sdrone_state_handle->controller_state.prevErr[SDRONE_OMEGA_POS] = sdrone_state_handle->controller_state.err[SDRONE_OMEGA_POS];
 	sdrone_state_handle->controller_state.prevErr[SDRONE_ALFA_POS] = sdrone_state_handle->controller_state.err[SDRONE_ALFA_POS];
 
-	// Calc new prediction
-	// pred teta
-	sdrone_state_handle->controller_state.predX[SDRONE_TETA_POS] =
-			sdrone_state_handle->controller_state.X[SDRONE_TETA_POS]
-			+ sdrone_state_handle->controller_state.U[SDRONE_TETA_POS] * SDRONE_REF_SIGNAL_DT; // questo è corretto.
 
-	// pred alfa
-	sdrone_state_handle->controller_state.predX[SDRONE_ALFA_POS] =
-			((- sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]
-			 + sdrone_state_handle->controller_state.U[SDRONE_TETA_POS] / SDRONE_REF_SIGNAL_DT
-			) * 2.0f)
-		;
-	// pred omega
+	// LPF on U
+	float U = sdrone_state_handle->controller_state.U[SDRONE_TETA_POS]*SDRONE_REACTIVITY_FACTOR;
+	if(!(-SDRONE_MAX_RADIANS_PER_SECOND <= U && U <= SDRONE_MAX_RADIANS_PER_SECOND)
+	  ) {
+		if(U < 0.0f) {
+			U = -SDRONE_MAX_RADIANS_PER_SECOND;
+		} else {
+			U = SDRONE_MAX_RADIANS_PER_SECOND;
+		}
+	}
+
+	// Calc new prediction
+	sdrone_state_handle->controller_state.predX[SDRONE_ALFA_POS] = // TODO: questo è proprio sbagliato. Ripartire da U = omega*dt+1/2*alfa*dt^2 (alfa incognita)
+						 + 2.0f*(U-sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]);
 	sdrone_state_handle->controller_state.predX[SDRONE_OMEGA_POS] =
-			(   sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]
-		      - sdrone_state_handle->controller_state.predX[SDRONE_ALFA_POS] * SDRONE_REF_SIGNAL_DT
-			)
-		;
+			                sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]
+			              + sdrone_state_handle->controller_state.X[SDRONE_ALFA_POS]/SDRONE_CONTROLLER_DT;
+	sdrone_state_handle->controller_state.predX[SDRONE_TETA_POS] =
+			               sdrone_state_handle->controller_state.X[SDRONE_TETA_POS]
+						 + sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]*SDRONE_CONTROLLER_DT
+						 + 0.5f*sdrone_state_handle->controller_state.X[SDRONE_ALFA_POS]*SDRONE_CONTROLLER_DT2;
 
 	// response
-	Y[0] = (- sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]
-			+ sdrone_state_handle->controller_state.U[SDRONE_TETA_POS]
-					/ SDRONE_REF_SIGNAL_DT
-			+ sdrone_state_handle->controller_state.err[SDRONE_ALFA_POS]*sdrone_state_handle->controller_state.ke
-		   ) * SDRONE_AXIS_LENGTH
-		   / (2.0f)
-//		   + sdrone_state_handle->controller_state.ierr[SDRONE_ALFA_POS]*sdrone_state_handle->controller_state.ki
+	Y[0] = (  0.5f*SDRONE_AXIS_LENGTH*sdrone_state_handle->controller_state.predX[SDRONE_ALFA_POS]
+		    + sdrone_state_handle->controller_state.err[SDRONE_ALFA_POS]*sdrone_state_handle->controller_state.ke
+//			+ sdrone_state_handle->controller_state.ierr[SDRONE_ALFA_POS]*sdrone_state_handle->controller_state.ki
+		   )*SDRONE_RESPONSE_GAIN
 //		   + sdrone_state_handle->controller_state.derr[SDRONE_ALFA_POS]*sdrone_state_handle->controller_state.kd
 			;
-	Y[1] = (  sdrone_state_handle->controller_state.X[SDRONE_OMEGA_POS]
-			- sdrone_state_handle->controller_state.U[SDRONE_TETA_POS]
-					/ SDRONE_REF_SIGNAL_DT
-			- sdrone_state_handle->controller_state.err[SDRONE_ALFA_POS]*sdrone_state_handle->controller_state.ke
-		   ) * SDRONE_AXIS_LENGTH / (2.0f)
-//		   - sdrone_state_handle->controller_state.ierr[SDRONE_ALFA_POS]*sdrone_state_handle->controller_state.ki
+	Y[1] = ( - 0.5f*SDRONE_AXIS_LENGTH*sdrone_state_handle->controller_state.predX[SDRONE_ALFA_POS]*1.5f
+		     - sdrone_state_handle->controller_state.err[SDRONE_ALFA_POS]*sdrone_state_handle->controller_state.ke
+//			 - sdrone_state_handle->controller_state.ierr[SDRONE_ALFA_POS]*sdrone_state_handle->controller_state.ki
+		   )*SDRONE_RESPONSE_GAIN
 //		   - sdrone_state_handle->controller_state.derr[SDRONE_ALFA_POS]*sdrone_state_handle->controller_state.kd
 			;
 
