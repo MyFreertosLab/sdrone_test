@@ -325,16 +325,12 @@ esp_err_t sdrone_controller_two_horizontal_axis_control(
 	Y[0] = (
 			+ 0.25f*sdrone_state_handle->controller_state.predX[SDRONE_ALFA_POS]
 		    + sdrone_state_handle->controller_state.err[SDRONE_ALFA_POS]*sdrone_state_handle->controller_state.ke
-//		    + sdrone_state_handle->controller_state.derr[SDRONE_ALFA_POS]*sdrone_state_handle->controller_state.kd
-//			+ sdrone_state_handle->controller_state.ierr[SDRONE_ALFA_POS]*sdrone_state_handle->controller_state.ki
 		   )
 //		   *SDRONE_RESPONSE_GAIN
 			;
 	Y[1] = (
 			 - 0.25f*sdrone_state_handle->controller_state.predX[SDRONE_ALFA_POS]
 		     - sdrone_state_handle->controller_state.err[SDRONE_ALFA_POS]*sdrone_state_handle->controller_state.ke
-//		     - sdrone_state_handle->controller_state.derr[SDRONE_ALFA_POS]*sdrone_state_handle->controller_state.kd
-//			 - sdrone_state_handle->controller_state.ierr[SDRONE_ALFA_POS]*sdrone_state_handle->controller_state.ki
 		   )
 //		   *SDRONE_RESPONSE_GAIN
 			;
